@@ -36,9 +36,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $photo = null;
 
-    #[ORM\Column]
-    private ?bool $accountEnabled = null;
-
     #[ORM\Column(length: 255)]
     private ?string $token = null;
 
@@ -135,18 +132,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setPhoto(?string $photo): self
     {
         $this->photo = $photo;
-
-        return $this;
-    }
-
-    public function isAccountEnabled(): ?bool
-    {
-        return $this->accountEnabled;
-    }
-
-    public function setAccountEnabled(bool $accountEnabled): self
-    {
-        $this->accountEnabled = $accountEnabled;
 
         return $this;
     }
