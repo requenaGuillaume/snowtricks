@@ -33,7 +33,8 @@ class RegistrationController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            // encode the plain password
+            // TODO VALIDATION (username etc already exist etc)
+
             $user->setPassword(
                 $userPasswordHasher->hashPassword(
                     $user,
@@ -54,7 +55,6 @@ class RegistrationController extends AbstractController
                     ->subject('Please Confirm your Email')
                     ->htmlTemplate('registration/confirmation_email.html.twig')
             );
-            // do anything else you need here, like send an email
 
             // TODO : redirect to the login page
             return $this->redirectToRoute('app_home');
