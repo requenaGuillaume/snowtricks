@@ -14,6 +14,13 @@
         {% endblock %}
     </head>
     <body>
+        {% for key, messages in app.flashes %}
+            <div class="alert alert-{{ key }}">
+                {% for message in messages %}
+                    {{ message }}
+                {% endfor %}
+            </div>
+        {% endfor %}
         {% block body %}{% endblock %}
     </body>
 </html>
