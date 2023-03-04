@@ -27,14 +27,31 @@ class RegistrationController extends AbstractController
     }
 
     #[Route('/register', name: 'app_register')]
-    public function register(Request $request, UserPasswordHasherInterface $userPasswordHasher, EntityManagerInterface $entityManager): Response
+    public function register(
+        Request $request, 
+        UserPasswordHasherInterface $userPasswordHasher, 
+        EntityManagerInterface $entityManager,
+        UserRepository $userRepository
+    ): Response
     {
         $user = new User();
         $form = $this->createForm(RegistrationFormType::class, $user);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            // TODO VALIDATION (username etc already exist etc)
+            $usernameAlreadyExist = $userRepository->findOneBy(['username' => $form->get('username')->getData()]);
+
+            if($usernameAlreadyExist){
+                $this->addFlash('danger', 'This username already exist.');
+                return $this->redirectToRoute('app_register');
+            }
+
+            $emailAlreadyExist = $userRepository->findOneBy(['email' => $form->get('email')->getData()]);
+
+            if($emailAlreadyExist){
+                $this->addFlash('danger', 'This email already exist.');
+                return $this->redirectToRoute('app_register');
+            }
 
             $user->setPassword(
                 $userPasswordHasher->hashPassword(
@@ -57,8 +74,7 @@ class RegistrationController extends AbstractController
                     ->htmlTemplate('registration/confirmation_email.html.twig')
             );
 
-            // TODO : redirect to the login page
-            return $this->redirectToRoute('app_home');
+            return $this->redirectToRoute('app_login');
         }
 
         return $this->render('registration/register.html.twig', [
@@ -80,9 +96,8 @@ class RegistrationController extends AbstractController
             return $this->redirectToRoute('app_register');
         }
 
-        // TODO Change the redirect on success and handle or remove the flash message in your templates
-        $this->addFlash('success', 'Your email address has been verified.');
+        $this->addFlash('success', 'Your email address has been verified, you can log in now.');
 
-        return $this->redirectToRoute('app_register');
+        return $this->redirectToRoute('app_login');
     }
 }
