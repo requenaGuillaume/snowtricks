@@ -27,14 +27,31 @@ class RegistrationController extends AbstractController
     }
 
     #[Route('/register', name: 'app_register')]
-    public function register(Request $request, UserPasswordHasherInterface $userPasswordHasher, EntityManagerInterface $entityManager): Response
+    public function register(
+        Request $request, 
+        UserPasswordHasherInterface $userPasswordHasher, 
+        EntityManagerInterface $entityManager,
+        UserRepository $userRepository
+    ): Response
     {
         $user = new User();
         $form = $this->createForm(RegistrationFormType::class, $user);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            // TODO VALIDATION (username etc already exist etc)
+            $usernameAlreadyExist = $userRepository->findOneBy(['username' => $form->get('username')->getData()]);
+
+            if($usernameAlreadyExist){
+                $this->addFlash('danger', 'This username already exist.');
+                return $this->redirectToRoute('app_register');
+            }
+
+            $emailAlreadyExist = $userRepository->findOneBy(['email' => $form->get('email')->getData()]);
+
+            if($emailAlreadyExist){
+                $this->addFlash('danger', 'This email already exist.');
+                return $this->redirectToRoute('app_register');
+            }
 
             $user->setPassword(
                 $userPasswordHasher->hashPassword(
