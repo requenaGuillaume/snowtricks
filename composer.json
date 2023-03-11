@@ -41,6 +41,7 @@
     "symfony/web-link": "6.2.*",
     "symfony/yaml": "6.2.*",
     "symfonycasts/verify-email-bundle": "^1.13",
+    "symfonycasts/reset-password-bundle": "^1.14",
     "twig/extra-bundle": "^2.12|^3.0",
     "twig/twig": "^2.12|^3.0"
   },
@@ -96,6 +97,7 @@
     }
   },
   "require-dev": {
+    "doctrine/doctrine-fixtures-bundle": "^3.4",
     "phpstan/extension-installer": "^1.2",
     "phpstan/phpstan-symfony": "^1.2",
     "phpunit/phpunit": "^9.5",
