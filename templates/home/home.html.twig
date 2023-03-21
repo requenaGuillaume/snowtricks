@@ -1,0 +1,22 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Home{% endblock %}
+
+{% block body %}
+    <h1 class="text-center">Snowtricks</h1>
+    <p>
+        Lorem ipsum dolor sit amet consectetur adipisicing elit. Molestiae possimus ullam neque cum excepturi 
+        quibusdam quidem dolor voluptatibus, culpa maxime.
+    </p>
+    <p>
+        Lorem ipsum dolor sit amet consectetur adipisicing elit. Incidunt neque temporibus quam, soluta veritatis 
+        similique minima consectetur ut eum eius commodi consequuntur, ratione esse accusantium asperiores itaque laborum 
+        tempora ex provident veniam doloremque numquam. Minima, cumque aperiam debitis illum ab vel ad quidem! Deleniti 
+        veritatis tempore similique? Obcaecati, laboriosam qui!
+    </p>
+    <div class="d-flex flex-row flex-wrap justify-content-between p-2 bd-highlight">
+        {% for trick in tricks %}
+            {% include "partials/_card.html.twig" with {'trick': trick} only %}            
+        {% endfor %}
+    </div>
+{% endblock %}
