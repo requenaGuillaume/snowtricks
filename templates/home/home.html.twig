@@ -1,5 +1,22 @@
 {% extends 'base.html.twig' %}
 
+{% block stylesheets %}
+    <style>
+        @media screen and (max-width: 991px){
+           body .container p + .d-flex .card{
+                width: 30% !important;
+            }
+        }
+
+        @media screen and (max-width: 768px){
+           body .container p + .d-flex .card{
+                width: 70% !important;
+                margin: 0 auto;
+            }
+        }
+    </style>
+{% endblock %}
+
 {% block title %}Home{% endblock %}
 
 {% block body %}

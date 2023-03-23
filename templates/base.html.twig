@@ -17,11 +17,11 @@
             {{ encore_entry_script_tags('app') }}
         {% endblock %}
     </head>
-    <body>
+    <body class="bg-dark text-light">
         <header>
             {% include "shared/navbar.html.twig" %}
         </header>
-        <main class='container'>
+        <main class='container mt-4'>
             {% for key, messages in app.flashes %}
                 <div class="alert alert-{{ key }}">
                     {% for message in messages %}
