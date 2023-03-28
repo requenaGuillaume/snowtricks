@@ -6,11 +6,14 @@
     {% for flash_error in app.flashes('reset_password_error') %}
         <div class="alert alert-danger" role="alert">{{ flash_error }}</div>
     {% endfor %}
-    <h1>Forgot password</h1>
+    <h1 class="text-center">Forgot password</h1>
 
-    {{ form_start(requestForm) }}
-        {{ form_row(requestForm.username) }}
+    {{ form_start(requestForm, {'attr': {'class': 'col-4 mx-auto mt-5 mb-5'}}) }}
+        {{ form_label(requestForm.username, 'Username', {'label_attr': {'class': 'd-block text-center'}}) }}
+        {{ form_widget(requestForm.username, {'attr': {'class': 'form-control mb-2'}}) }}
 
-        <button class="btn btn-primary">Ask for reset password</button>
+        <button class="btn btn-primary" style="margin-left: 50%; transform: translateX(-50%);">
+            Ask for reset password
+        </button>
     {{ form_end(requestForm) }}
 {% endblock %}
