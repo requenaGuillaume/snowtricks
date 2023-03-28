@@ -2,6 +2,10 @@
 
 {% block stylesheets %}
     <style>
+        #bottom-arrow i:hover{
+            color: blue !important;
+        }
+
         @media screen and (max-width: 991px){
            body .container p + .d-flex .card{
                 width: 30% !important;
@@ -20,7 +24,7 @@
 {% block title %}Home{% endblock %}
 
 {% block body %}
-    <h1 class="text-center">Snowtricks</h1>
+    <h1 class="text-center" id="top">Snowtricks</h1>
     <p>
         Lorem ipsum dolor sit amet consectetur adipisicing elit. Molestiae possimus ullam neque cum excepturi 
         quibusdam quidem dolor voluptatibus, culpa maxime.
@@ -31,9 +35,19 @@
         tempora ex provident veniam doloremque numquam. Minima, cumque aperiam debitis illum ab vel ad quidem! Deleniti 
         veritatis tempore similique? Obcaecati, laboriosam qui!
     </p>
-    <div class="d-flex flex-row flex-wrap justify-content-between p-2 bd-highlight">
+    <div class="d-flex flex-row flex-wrap justify-content-between p-2 bd-highlight mb-4">
         {% for trick in tricks %}
             {% include "partials/_card.html.twig" with {'trick': trick} only %}            
         {% endfor %}
     </div>
+
+    {% if tricksCount > 15 %}
+        <div class="text-end position-relative pb-4">
+            <a href="#top" class="fs-1" id="bottom-arrow">
+                <i class="fa-solid fa-arrow-up text-light position-absolute end-2">
+                </i>
+            </a>
+        </div>
+    {% endif %}
+    
 {% endblock %}
