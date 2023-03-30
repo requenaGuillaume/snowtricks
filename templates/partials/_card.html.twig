@@ -7,7 +7,7 @@
   </div>
   <div class="card-body d-flex justify-content-between">
     <h5 class="card-title">
-        <a href="{{ path('app_trick', {'id': trick.id}) }}" class="btn">
+        <a href="{{ path('app_trick', {'slug': trick.slug}) }}" class="btn">
           {{ trick.title | capitalize }}
         </a>
     </h5>

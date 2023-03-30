@@ -9,7 +9,7 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class TrickController extends AbstractController
 {
-    #[Route('/trick/show/{id}', name: 'app_trick', requirements: ['id' => '\d+'])]
+    #[Route('/trick/show/{slug}', name: 'app_trick', requirements: ['slug' => '[a-z0-9][a-z0-9-]{0,}[a-z0-9]'])]
     public function index(Trick $trick): Response
     {
         if(!$trick){

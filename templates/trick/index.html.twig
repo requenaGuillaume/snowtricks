@@ -15,8 +15,40 @@
 {% block title %}{{ trick.title | capitalize }}{% endblock %}
 
 {% block body %}
-    <div class="bg-image d-flex align-items-center justify-content-center" 
+    <div class="bg-image d-flex align-items-center justify-content-center mb-4" 
         style="background-image: url('https://127.0.0.1:8000/assets/images/tricks/{{mainImage}}')">
         <h1 class="text-center">{{ trick.title | capitalize }}</h1>
+    </div>
+
+    <div class="d-flex justify-content-between">
+        {% set imageNumber = 1 %}
+        {% for image in otherImages %}
+            <div class="mb-4" style="width: 20%; height: 100px;">
+                <img src="https://127.0.0.1:8000/assets/images/tricks/{{image}}" 
+                    alt="{{trick.title}} {{imageNumber}}"
+                    class="w-100"
+                >
+            </div>
+            {% set imageNumber = imageNumber + 1 %}
+        {% endfor %}
+
+        {% set videoNumber = 1 %}
+        {% for video in trick.videos %}
+            <div class="mb-4" style="width: 20%; height: 100px;">
+                {# <iframe width="100%"
+                    height="125%"
+                    src={{video}}
+                    title="YouTube video player"
+                    frameborder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                    allowfullscreen>
+                </iframe> #}
+                <pre>
+                    {{ dump(video) }}
+                </pre>
+                <iframe width="100%" height="100%" src="https://www.youtube.com/embed/jm19nEvmZgM" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+            </div>
+            {% set videoNumber = videoNumber + 1 %}
+        {% endfor %}
     </div>
 {% endblock %}
