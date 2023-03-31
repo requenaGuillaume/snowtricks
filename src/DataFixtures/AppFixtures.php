@@ -192,7 +192,8 @@ class AppFixtures extends Fixture
                 ->setSlug(strtolower($this->slugger->slug($title)))
                 ->setDescription(trim(self::TRICKS_INFOS[$t]['description']))
                 ->setImages(self::TRICKS_INFOS[$t]['photos'])
-                ->setVideos(self::TRICKS_INFOS[$t]['videos']);
+                ->setVideos(self::TRICKS_INFOS[$t]['videos'])
+                ->setCreatedAt(DateTimeImmutable::createFromMutable($faker->dateTimeBetween('-1 week', '+1 week')));
 
             // Comments
             $numberOfComments = mt_rand(2, 5);

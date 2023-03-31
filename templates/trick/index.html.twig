@@ -50,4 +50,12 @@
             {% set videoNumber = videoNumber + 1 %}
         {% endfor %}
     </div>
+    <p class="mt-4 mb-4">
+        {{trick.description}}
+    </p>
+    <div class="w-50 d-flex justify-content-between">
+        <p>{{trick.category.title}}</p>
+        <p>{{trick.author.username}}</p>
+        {# <p>{{trick.category.title}}</p> #}
+    </div>
 {% endblock %}
