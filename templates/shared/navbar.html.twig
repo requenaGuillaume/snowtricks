@@ -1,0 +1,29 @@
+<nav class="navbar navbar-expand navbar-secondary bg-secondary">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="#">
+        <img src={{ asset('assets/images/snowtricks.png') }} alt="snowtricks logo">
+    </a>
+    <div class="collapse navbar-collapse justify-content-end me-5">
+      <ul class="navbar-nav">
+        <li class="nav-item border-end border-dark">
+          <a class="nav-link" href="{{ path('app_home') }}">Home</a>
+        </li>
+        <li class="nav-item border-end border-dark">
+          <a class="nav-link" href="{{ path('app_home') }}">Tricks</a>
+        </li>
+        {% if app.user %}
+          <li class="nav-item border-dark me-5">
+            <a class="nav-link" href="{{ path('app_logout') }}">Log out</a>
+          </li>
+        {% else %}
+          <li class="nav-item border-end border-dark">
+            <a class="nav-link" href="{{ path('app_login') }}">Sign in</a>
+          </li>
+          <li class="nav-item me-5">
+            <a class="nav-link" href="{{ path('app_register') }}">Sign up</a>
+          </li>        
+        {% endif %}        
+      </ul>
+    </div>
+  </div>
+</nav>
