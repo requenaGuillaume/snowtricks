@@ -202,7 +202,7 @@ class AppFixtures extends Fixture
                 $comment = new Comment();
                 $comment->setAuthor($users[mt_rand(0, 9)])
                     ->setContent($faker->paragraph())
-                    ->setCreatedAt(DateTimeImmutable::createFromMutable($faker->dateTimeBetween('-1 week', '+1 week')))
+                    ->setCreatedAt(DateTimeImmutable::createFromMutable($faker->dateTimeBetween('-1 week', 'now')))
                     ->setTrick($trick);
 
                 $trick->addComment($comment);
