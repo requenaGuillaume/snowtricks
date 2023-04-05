@@ -76,11 +76,15 @@ class TrickController extends AbstractController
     #[Route('/trick/edit/{slug}', name: 'app_trick_edit', requirements: ['slug' => '[a-z0-9][a-z0-9-]{0,}[a-z0-9]'])]
     public function createOrEdit(?Trick $trick = null, Request $request)
     {
+        $edit = false;
+
         if($request->attributes->get('_route') === 'app_trick_edit'){
             if(!$trick){
                 $this->addFlash('danger', 'Trick not found');
                 return $this->redirectToRoute('app_home');
             }
+
+            $edit = true;
         }
 
         if(!$trick){
@@ -90,7 +94,8 @@ class TrickController extends AbstractController
         $form = $this->createForm(TrickFormType::class, $trick);
         
         return $this->render('trick/create_or_edit.html.twig', [
-            'form' => $form->createView()
+            'form' => $form->createView(),
+            'edit' => $edit
         ]);
     }
 }

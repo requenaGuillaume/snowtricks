@@ -1,10 +1,24 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}{% endblock %}
+{% block title %}
+    {% if edit %}
+        Edit
+    {% else %}
+        Create    
+    {% endif %}    
+{% endblock %}
 
 {% block body %}
 
     {{ form_start(form) }}
+        {{ form_label(form.title, 'Title', {'label_attr': {'class': 'd-block text-center'}}) }}
+        {{ form_widget(form.title, {'attr': {'class': 'form-control mb-2'}}) }}
+
+        {{ form_label(form.description, 'Description', {'label_attr': {'class': 'd-block text-center'}}) }}
+        {{ form_widget(form.description, {'attr': {'class': 'form-control mb-2'}}) }}
+
+        {{ form_label(form.category, 'Group', {'label_attr': {'class': 'd-block text-center'}}) }}
+        {{ form_widget(form.category, {'attr': {'class': 'form-control mb-2'}}) }}
     {{ form_end(form) }}
         
 {% endblock %}
