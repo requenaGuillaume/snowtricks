@@ -20,5 +20,33 @@
         {{ form_label(form.category, 'Group', {'label_attr': {'class': 'd-block text-center'}}) }}
         {{ form_widget(form.category, {'attr': {'class': 'form-control mb-2'}}) }}
     {{ form_end(form) }}
+
+    {% if edit %}
+        <div class="d-flex">
+            {% for image in trick.images %}
+                <div class="p-2" style="width: 20%; height: 10rem; overflow: hidden;">
+                    <img src="https://127.0.0.1:8000/assets/images/tricks/{{image}}" 
+                        alt=""
+                        style="width: 100%;"
+                    >
+                </div>
+            {% endfor %}
+        </div>
+        <div class="d-flex">
+            {% for video in trick.videos %}
+                <div class="p-2" style="width: 20%; height: 10rem; overflow: hidden;">
+                    <iframe width="100%"
+                        height="125%"
+                        src={{video}}
+                        title="YouTube video player"
+                        frameborder="0"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                        allowfullscreen>
+                    </iframe>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+    
         
 {% endblock %}
