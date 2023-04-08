@@ -1,0 +1,135 @@
+{% extends 'base.html.twig' %}
+
+{% block stylesheets %}
+    <style>
+        .bg-image{
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            width: 100%;
+            height: 70vh;
+        }
+        form{
+            margin: 0 auto;
+        }
+        textarea{
+            width: 60%;
+            height: 33px;
+        }
+        .avatars{
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+        }
+        button{
+            margin: 0 auto;
+        }
+
+        @media screen and (max-width: 575px){
+            .hide{
+                display: none !important;
+            }
+        }
+    </style>
+{% endblock %}
+
+{% block title %}{{ trick.title | capitalize }}{% endblock %}
+
+{% block body %}
+    <div class="bg-image d-flex align-items-center justify-content-center mb-4" 
+        style="background-image: url('https://127.0.0.1:8000/assets/images/tricks/{{mainImage}}')">
+        <h1 class="text-center">{{ trick.title | capitalize }}</h1>
+    </div>
+
+    <button id="mobile" class="d-sm-none d-block w-50 btn btn-primary">See medias</button>
+
+    <div id="medias" class="d-flex justify-content-between hide">
+        {% set imageNumber = 1 %}
+        {% for image in otherImages %}
+            <div class="mb-4" style="width: 20%; height: 100px;">
+                <img src="https://127.0.0.1:8000/assets/images/tricks/{{image}}" 
+                    alt="{{trick.title}} {{imageNumber}}"
+                    class="w-100"
+                >
+            </div>
+            {% set imageNumber = imageNumber + 1 %}
+        {% endfor %}
+
+        {% set videoNumber = 1 %}
+        {% for video in trick.videos %}
+            <div class="mb-4" style="width: 20%; height: 100px;">
+            {# TODO : format https://www.youtube.com/watch?jm19nEvmZgM 
+                TO : https://www.youtube.com/embed/jm19nEvmZgM
+            #}
+                <iframe width="100%"
+                    height="125%"
+                    src={{video}}
+                    title="YouTube video player"
+                    frameborder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                    allowfullscreen>
+                </iframe>
+            </div>
+            {% set videoNumber = videoNumber + 1 %}
+        {% endfor %}
+    </div>
+    <p class="mt-4 mb-4">
+        {{trick.description}}
+    </p>
+    <div class="w-75 border-bottom mb-4" style="margin: 0 auto;">
+        <div class="w-75 d-flex justify-content-between" style="margin: 0 auto;">
+            <p>{{trick.category.title}}</p>
+            <p>{{trick.author.username}}</p>
+            <p>created : {{trick.createdAt | date("d-m-Y")}}</p>
+
+            {% if trick.updatedAt %}
+                <p>last update : {{trick.updatedAt | date("d-m-Y")}}</p>
+            {% endif %}        
+        </div>
+    </div>
+    {% if app.user %}
+        <div class="w-75 border-bottom mb-4" style="margin: 0 auto;">
+            <div class="w-75" style="margin: 0 auto;">            
+                {{ form_start(commentForm) }}
+                    {{ form_widget(commentForm.content, {'attr': {'class': 'd-inline'}}) }}
+
+                    <button type="submit" class="d-inline btn btn-primary mb-4 ms-2">
+                        Leave a comment
+                    </button>
+                {{ form_end(commentForm) }}
+            </div>
+        </div>
+    {% endif %}
+
+    <div class="w-75 mb-4" style="margin: 0 auto;">
+        {% for comment in comments %}
+            {% if comment.author.photo is null %}
+                {% set photo = 'snowtricks.png' %}
+                {% set alt = 'Snowtricks logo' %}
+            {% else %}
+                {% set photo = 'avatars/'~ comment.author.photo ~'' %}
+                {% set alt = 'Snowtricks '~ comment.author.username ~" 's avatar" %}
+            {% endif %}
+            <div class="w-75 mb-4 mt-4 d-flex" style="margin: 0 auto;">
+                <img class="avatars" src={{ asset("assets/images/"~ photo ~'') }} alt={{alt}}>
+                <div class="ps-4">
+                    <p>{{ comment.author.username }} at {{ comment.createdAt | date("d-m-Y")}} :</p>
+                    <p>{{ comment.content }}</p>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+    
+{% endblock %}
+
+{% block javascripts %}
+    <script>
+        const mediaButton = document.getElementById('mobile');
+        const medias = document.getElementById('medias');
+
+        mediaButton.addEventListener('click', () => {
+            medias.classList.remove('hide');
+            mediaButton.classList.add('hide');
+        });
+    </script>
+{% endblock %}

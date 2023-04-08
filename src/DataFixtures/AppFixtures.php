@@ -46,7 +46,7 @@ class AppFixtures extends Fixture
                     board between his two legs. He also has to grab the the middle edge of the board using his front hand at that moment.
                 ',
             'photos' => ['19.jpg', '20.jpg', '21.jpg'],
-            'videos' => ['https://www.youtube.com/watch?v=jm19nEvmZgM', 'https://www.youtube.com/watch?v=k6aOWf0LDcQ']
+            'videos' => ['https://www.youtube.com/embed/jm19nEvmZgM', 'https://www.youtube.com/embed/k6aOWf0LDcQ']
         ],
         [
             'title' => 'sad',
@@ -55,7 +55,7 @@ class AppFixtures extends Fixture
                     towards the ground.
                 ',
             'photos' => ['24.jpg'],
-            'videos' => ['https://www.youtube.com/watch?v=KEdFwJ4SWq4']
+            'videos' => ['https://www.youtube.com/embed/KEdFwJ4SWq4']
         ],
         [
             'title' => 'indy',
@@ -65,7 +65,7 @@ class AppFixtures extends Fixture
                     toes are pointing, while turning backside.
                 ',
             'photos' => ['1.png', '2.jpg', '3.jpg'],
-            'videos' => ['https://www.youtube.com/watch?v=iKkhKekZNQ8']
+            'videos' => ['https://www.youtube.com/embed/iKkhKekZNQ8']
         ],
         // Rotation
         [
@@ -76,7 +76,7 @@ class AppFixtures extends Fixture
                     ollies and with riding switch.
                 ',
             'photos' => ['12.png', '13.jpg'],
-            'videos' => ['https://www.youtube.com/watch?v=ATMiAVTLsuc']
+            'videos' => ['https://www.youtube.com/embed/ATMiAVTLsuc']
         ],
         [
             'title' => '360',
@@ -84,7 +84,7 @@ class AppFixtures extends Fixture
                     A frontside 360 is when you leave the slope and rotate in the air 360 degrees before hitting the ground again.
                 ',
             'photos' => ['4.jpg', '5.jpg', '6.jpg'],
-            'videos' => ['https://www.youtube.com/watch?v=JJy39dO_PPE']
+            'videos' => ['https://www.youtube.com/embed/JJy39dO_PPE']
         ],
         [
             'title' => '1080',
@@ -92,7 +92,7 @@ class AppFixtures extends Fixture
                     A 1080 consists of three full rotations in the air.
                 ',
             'photos' => ['7.jpg', '8.png'],
-            'videos' => ['https://www.youtube.com/watch?v=3XxfClLqjg4']
+            'videos' => ['https://www.youtube.com/embed/3XxfClLqjg4']
         ],
         // Old school
         [
@@ -102,7 +102,7 @@ class AppFixtures extends Fixture
                     leg to grab the edge of his snowboard nearest to his toes—the “toe edge”—and then pulls the board behind him.
                 ',
             'photos' => ['14.jpg', '15.png'],
-            'videos' => ['https://www.youtube.com/watch?v=jH76540wSqU']
+            'videos' => ['https://www.youtube.com/embed/jH76540wSqU']
         ],
         [
             'title' => 'rocket air',
@@ -111,7 +111,7 @@ class AppFixtures extends Fixture
                     roast beef and nose grab done at the same time.
                 ',
             'photos' => ['22.jpg', '23.png'],
-            'videos' => ['https://www.youtube.com/watch?v=nom7QBoGh5w']
+            'videos' => ['https://www.youtube.com/embed/nom7QBoGh5w']
         ],
         [
             'title' => 'Backside Air',
@@ -121,7 +121,7 @@ class AppFixtures extends Fixture
                     the lip of the halfpipe and rotates 180 degrees in the backside direction.    
                 ',
             'photos' => ['9.jpg', '10.png', '11.png'],
-            'videos' => ['https://www.youtube.com/watch?v=_CN_yyEn78M']
+            'videos' => ['https://www.youtube.com/embed/_CN_yyEn78M']
         ],
         [
             'title' => 'Method Air',
@@ -130,7 +130,7 @@ class AppFixtures extends Fixture
                     pulls the board towards their back, while arching their back and bending knees.
                 ',
             'photos' => ['16.png', '17.png', '18.jpg'],
-            'videos' => ['https://www.youtube.com/watch?v=qMsN26DBLVo']
+            'videos' => ['https://www.youtube.com/embed/qMsN26DBLVo']
         ]
     ];
 
@@ -192,7 +192,8 @@ class AppFixtures extends Fixture
                 ->setSlug(strtolower($this->slugger->slug($title)))
                 ->setDescription(trim(self::TRICKS_INFOS[$t]['description']))
                 ->setImages(self::TRICKS_INFOS[$t]['photos'])
-                ->setVideos(self::TRICKS_INFOS[$t]['videos']);
+                ->setVideos(self::TRICKS_INFOS[$t]['videos'])
+                ->setCreatedAt(DateTimeImmutable::createFromMutable($faker->dateTimeBetween('-1 week', '+1 week')));
 
             // Comments
             $numberOfComments = mt_rand(2, 5);
@@ -201,7 +202,7 @@ class AppFixtures extends Fixture
                 $comment = new Comment();
                 $comment->setAuthor($users[mt_rand(0, 9)])
                     ->setContent($faker->paragraph())
-                    ->setCreatedAt(DateTimeImmutable::createFromMutable($faker->dateTimeBetween('-1 week', '+1 week')))
+                    ->setCreatedAt(DateTimeImmutable::createFromMutable($faker->dateTimeBetween('-1 week', 'now')))
                     ->setTrick($trick);
 
                 $trick->addComment($comment);
