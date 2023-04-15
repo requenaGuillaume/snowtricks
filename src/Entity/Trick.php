@@ -136,6 +136,16 @@ class Trick
         return $this;
     }
 
+    public function removeImage(string $image)
+    {
+        $images = $this->getImages();
+        if (($key = array_search($image, $images)) !== false) {
+            unset($images[$key]);
+        }
+
+        $this->setImages($images);
+    }
+
     public function getVideos(): array
     {
         return $this->videos;

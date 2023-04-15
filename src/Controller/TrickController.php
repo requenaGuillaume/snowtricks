@@ -74,7 +74,7 @@ class TrickController extends AbstractController
 
     #[Route('/trick/create', name: 'app_trick_create')]
     #[Route('/trick/edit/{slug}', name: 'app_trick_edit', requirements: ['slug' => '[a-z0-9][a-z0-9-]{0,}[a-z0-9]'])]
-    public function createOrEdit(?Trick $trick = null, Request $request)
+    public function createOrEdit(?Trick $trick = null, Request $request): Response
     {
         $edit = false;
 
@@ -98,5 +98,27 @@ class TrickController extends AbstractController
             'edit' => $edit,
             'trick' => $trick
         ]);
+    }
+
+    #[Route('/trick/edit/{slug}/remove-image/{image}', 
+        name: 'app_trick_remove_image', 
+        requirements: ['slug' => '[a-z0-9][a-z0-9-]{0,}[a-z0-9]', 'image' => '\d+\.{1}(jpg|jpeg|png)'])
+    ]
+    public function removeImage(Trick $trick, string $image): Response
+    {
+        if(!$trick){
+            $this->addFlash('danger', 'Trick not found');
+            return new Response();
+        }
+
+        if(!in_array($image, $trick->getImages())){
+            $this->addFlash('danger', 'This trick does not have this image');
+            return new Response();
+        }
+
+        $trick->removeImage($image);
+        $this->em->flush();
+
+        return new Response();
     }
 }
