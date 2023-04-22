@@ -20,31 +20,33 @@
 
     {{ form_start(form) }}
         {{ form_label(form.title, 'Title', {'label_attr': {'class': 'd-block text-center'}}) }}
-        {{ form_widget(form.title, {'attr': {'class': 'form-control mb-2'}}) }}
+        {{ form_widget(form.title, {'attr': {'class': 'form-control mb-2 mt-2'}}) }}
 
         {{ form_label(form.description, 'Description', {'label_attr': {'class': 'd-block text-center'}}) }}
-        {{ form_widget(form.description, {'attr': {'class': 'form-control mb-2'}}) }}
+        {{ form_widget(form.description, {'attr': {'class': 'form-control mb-2 mt-2'}}) }}
 
         {{ form_label(form.category, 'Group', {'label_attr': {'class': 'd-block text-center'}}) }}
-        {{ form_widget(form.category, {'attr': {'class': 'form-control mb-2'}}) }}
+        {{ form_widget(form.category, {'attr': {'class': 'form-control mb-2 mt-2'}}) }}
     {{ form_end(form) }}
 
     {% if edit %}
-        <div class="d-flex">
+        <div class="d-flex js-data" data-slug={{trick.slug}}>
             {% set index = 0 %}
             {% for image in trick.images %}
-                <div class="p-2" style="width: 20%; height: 12rem; overflow: hidden;">
-                    <img src="https://127.0.0.1:8000/assets/images/tricks/{{image}}" 
+                <div id="{{image}}" class="p-2" style="width: 20%; height: 12rem; overflow: hidden;">
+                    <img src="https://127.0.0.1:8000/assets/images/tricks/{{image}}"
                         alt=""
                         style="width: 100%;"
+                        class="js-images"
+                        data-image={{image}}
                     >
                     {% if index > 0 %}
                         <a href="#" class="btn btn-primary mt-2">Set as main image</a>
                     {% endif %}
-                    <a href="#" class="btn btn-danger mt-2 float-end">
+                    <a href="#" id="button-{{image}}" class="btn btn-danger mt-2 float-end">
                         <i class="fa-solid fa-trash"></i>
                     </a>
-                </div>                
+                </div>
                 {% set index = index + 1 %}
             {% endfor %}
         </div>
@@ -65,7 +67,34 @@
                 </div>
             {% endfor %}
         </div>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+
+                const div = document.querySelector('.js-data');
+                const imagesElement = div.getElementsByClassName('js-images');
+                const slug = div.dataset.slug;
+
+                for(let i = 0; i < imagesElement.length; i++){
+                    let image = imagesElement[i].dataset.image;
+                    let button = document.getElementById('button-' + image);
+
+                    button.addEventListener('click', function(){
+                        let request = new Request(`https://127.0.0.1:8000/trick/edit/${slug}/remove-image/${image}`, { 
+                            method: 'GET',
+                            mode: 'cors',
+                            cache: 'default'
+                        });
+
+                        fetch(request).then(function(response){
+                            if(response.ok && response.status === 200){
+                                document.getElementById(image).style.display = 'none';
+                            }
+                        });
+                    });
+                }
+
+            });
+        </script>
     {% endif %}
-    
-        
 {% endblock %}
