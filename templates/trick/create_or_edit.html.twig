@@ -41,11 +41,11 @@
                         data-image={{image}}
                     >
                     {% if index > 0 %}
-                        <a href="#" class="btn btn-primary mt-2">Set as main image</a>
+                        <btn id="main-{{image}}" class="btn btn-primary mt-2">Set as main image</btn>
                     {% endif %}
-                    <a href="#" id="button-{{image}}" class="btn btn-danger mt-2 float-end">
+                    <btn id="delete-{{image}}" class="btn btn-danger mt-2 float-end">
                         <i class="fa-solid fa-trash"></i>
-                    </a>
+                    </btn>
                 </div>
                 {% set index = index + 1 %}
             {% endfor %}
@@ -77,21 +77,46 @@
 
                 for(let i = 0; i < imagesElement.length; i++){
                     let image = imagesElement[i].dataset.image;
-                    let button = document.getElementById('button-' + image);
+                    let deleteButton = document.getElementById('delete-' + image);
+                    let mainImageButton = document.getElementById('main-' + image);
 
-                    button.addEventListener('click', function(){
-                        let request = new Request(`https://127.0.0.1:8000/trick/edit/${slug}/remove-image/${image}`, { 
-                            method: 'GET',
-                            mode: 'cors',
-                            cache: 'default'
-                        });
+                    deleteButton.addEventListener('click', function(){
+                        let confirm = window.confirm('Confirm you want to delete this image.');
 
-                        fetch(request).then(function(response){
-                            if(response.ok && response.status === 200){
-                                document.getElementById(image).style.display = 'none';
+                        if(confirm){
+                            let request = new Request(`https://127.0.0.1:8000/trick/edit/${slug}/remove-image/${image}`, { 
+                                method: 'GET',
+                                mode: 'cors',
+                                cache: 'default'
+                            });
+    
+                            fetch(request).then(function(response){
+                                if(response.ok && response.status === 200){
+                                    document.getElementById(image).style.display = 'none';
+                                }
+                            });
+                        }
+                    });
+
+                    if(mainImageButton){
+                        mainImageButton.addEventListener('click', function(){
+                            let confirm = window.confirm('Confirm you want to set this image as main image.');
+
+                            if(confirm){
+                                let request = new Request(`https://127.0.0.1:8000/trick/edit/${slug}/main-image/${image}`, {
+                                    method: 'GET',
+                                    mode: 'cors',
+                                    cache: 'default'
+                                });
+        
+                                fetch(request).then(function(response){
+                                    if(response.ok && response.status === 200){
+                                        document.getElementById(`main-${image}`).innerHTML  = 'new main image';
+                                    }
+                                });
                             }
                         });
-                    });
+                    }
                 }
 
             });

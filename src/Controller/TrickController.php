@@ -102,8 +102,8 @@ class TrickController extends AbstractController
 
     #[Route('/trick/edit/{slug}/remove-image/{image}', 
         name: 'app_trick_remove_image', 
-        requirements: ['slug' => '[a-z0-9][a-z0-9-]{0,}[a-z0-9]', 'image' => '\d+\.{1}(jpg|jpeg|png)'])
-    ]
+        requirements: ['slug' => '[a-z0-9][a-z0-9-]{0,}[a-z0-9]', 'image' => '\d+\.{1}(jpg|jpeg|png)']
+    )]
     public function removeImage(Trick $trick, string $image): Response
     {
         if(!$trick){
@@ -117,6 +117,24 @@ class TrickController extends AbstractController
         }
 
         $trick->removeImage($image);
+        $this->em->flush();
+
+        return new Response();
+    }
+
+    #[Route('/trick/edit/{slug}/main-image/{image}', 
+        name: 'app_trick_main_image', 
+        requirements: ['slug' => '[a-z0-9][a-z0-9-]{0,}[a-z0-9]', 'image' => '\d+\.{1}(jpg|jpeg|png)']
+    )]
+    public function setMainImage(Trick $trick, string $image): Response
+    {
+        if(!$trick){
+            $this->addFlash('danger', 'Trick not found');
+            return new Response();
+        }
+
+        $trick->setMainImage($image);
+
         $this->em->flush();
 
         return new Response();

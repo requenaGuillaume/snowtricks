@@ -146,6 +146,19 @@ class Trick
         $this->setImages($images);
     }
 
+    public function setMainImage(string $image): self
+    {        
+        if(in_array($image, $this->getImages())){
+            $this->removeImage($image);
+        }
+
+        $images = $this->getImages();
+        array_unshift($images, $image);
+        $this->setImages($images);
+
+        return $this;
+    }
+
     public function getVideos(): array
     {
         return $this->videos;
