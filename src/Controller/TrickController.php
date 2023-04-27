@@ -139,4 +139,29 @@ class TrickController extends AbstractController
 
         return new Response();
     }
+
+
+    #[Route('/trick/edit/{slug}/remove-video/{videoIndex}', 
+        name: 'app_trick_remove_image',
+        requirements: ['slug' => '[a-z0-9][a-z0-9-]{0,}[a-z0-9]', 'videoIndex' => '\d+']
+    )]
+    public function removeVideo(Trick $trick, int $videoIndex): Response
+    {
+        if(!$trick){
+            $this->addFlash('danger', 'Trick not found');
+            return new Response();
+        }
+
+        $video = $trick->getVideos()[$videoIndex];
+
+        if(!$video){
+            $this->addFlash('danger', 'Video not found');
+            return new Response();
+        }
+
+        $trick->removeVideo($video);
+        $this->em->flush();
+
+        return new Response();
+    }
 }

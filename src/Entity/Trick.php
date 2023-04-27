@@ -136,7 +136,7 @@ class Trick
         return $this;
     }
 
-    public function removeImage(string $image)
+    public function removeImage(string $image): void
     {
         $images = $this->getImages();
         if (($key = array_search($image, $images)) !== false) {
@@ -169,6 +169,16 @@ class Trick
         $this->videos = $videos;
 
         return $this;
+    }
+
+    public function removeVideo(string $video): void
+    {
+        $videos = $this->getVideos();
+        if (($key = array_search($video, $videos)) !== false) {
+            unset($videos[$key]);
+        }
+
+        $this->setVideos($videos);
     }
 
     public function getAuthor(): ?User

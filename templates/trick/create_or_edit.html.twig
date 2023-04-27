@@ -30,7 +30,7 @@
     {{ form_end(form) }}
 
     {% if edit %}
-        <div class="d-flex js-data" data-slug={{trick.slug}}>
+        <div class="d-flex js-data-images" data-slug={{trick.slug}}>
             {% set index = 0 %}
             {% for image in trick.images %}
                 <div id="{{image}}" class="p-2" style="width: 20%; height: 12rem; overflow: hidden;">
@@ -51,8 +51,9 @@
             {% endfor %}
         </div>
         <div class="d-flex">
+            {% set index = 0 %}
             {% for video in trick.videos %}
-                <div class="p-2" style="width: 20%; height: 16rem; overflow: hidden;">
+                <div id="video-{{index}}" class="p-2" style="width: 20%; height: 16rem; overflow: hidden;">
                     <iframe width="100%"
                         height="80%"
                         src={{video}}
@@ -61,34 +62,35 @@
                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
                         allowfullscreen>
                     </iframe>
-                    <a href="#" class="btn btn-danger mt-2 float-end">
+                    <btn class="js-videos btn btn-danger mt-2 float-end">
                         <i class="fa-solid fa-trash"></i>
-                    </a>
+                    </btn>
                 </div>
+                {% set index = index + 1 %}
             {% endfor %}
         </div>
 
         <script>
             document.addEventListener('DOMContentLoaded', function() {
 
-                const div = document.querySelector('.js-data');
+                const div = document.querySelector('.js-data-images');
                 const imagesElement = div.getElementsByClassName('js-images');
+                const removeVideoButtons = document.getElementsByClassName('js-videos');
                 const slug = div.dataset.slug;
 
+                const init = {method: 'GET', mode: 'cors', cache: 'default'};
+
+                // delete image or set as main image
                 for(let i = 0; i < imagesElement.length; i++){
                     let image = imagesElement[i].dataset.image;
-                    let deleteButton = document.getElementById('delete-' + image);
-                    let mainImageButton = document.getElementById('main-' + image);
+                    let deleteButton = document.getElementById(`delete-${image}`);
+                    let mainImageButton = document.getElementById(`main-${image}`);
 
                     deleteButton.addEventListener('click', function(){
                         let confirm = window.confirm('Confirm you want to delete this image.');
 
                         if(confirm){
-                            let request = new Request(`https://127.0.0.1:8000/trick/edit/${slug}/remove-image/${image}`, { 
-                                method: 'GET',
-                                mode: 'cors',
-                                cache: 'default'
-                            });
+                            let request = new Request(`https://127.0.0.1:8000/trick/edit/${slug}/remove-image/${image}`, init);
     
                             fetch(request).then(function(response){
                                 if(response.ok && response.status === 200){
@@ -103,11 +105,7 @@
                             let confirm = window.confirm('Confirm you want to set this image as main image.');
 
                             if(confirm){
-                                let request = new Request(`https://127.0.0.1:8000/trick/edit/${slug}/main-image/${image}`, {
-                                    method: 'GET',
-                                    mode: 'cors',
-                                    cache: 'default'
-                                });
+                                let request = new Request(`https://127.0.0.1:8000/trick/edit/${slug}/main-image/${image}`, init);
         
                                 fetch(request).then(function(response){
                                     if(response.ok && response.status === 200){
@@ -117,6 +115,23 @@
                             }
                         });
                     }
+                }
+
+                // delete video
+                for(let i = 0; i < removeVideoButtons.length; i++){
+                    removeVideoButtons[i].addEventListener('click', function(){
+                        let confirm = window.confirm('Confirm you want to delete this video.');
+
+                        if(confirm){
+                            let request = new Request(`https://127.0.0.1:8000/trick/edit/${slug}/remove-video/${i}`, init);
+    
+                            fetch(request).then(function(response){
+                                if(response.ok && response.status === 200){
+                                    document.getElementById(`video-${i}`).style.display = 'none';
+                                }
+                            });
+                        }
+                    });
                 }
 
             });
