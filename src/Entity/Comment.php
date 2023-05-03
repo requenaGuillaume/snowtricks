@@ -22,11 +22,11 @@ class Comment
 
     #[ORM\ManyToOne(inversedBy: 'comments')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?User $author = null;
+    private ?Trick $trick = null;
 
     #[ORM\ManyToOne(inversedBy: 'comments')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?Trick $trick = null;
+    private ?User $author = null;
 
     public function getId(): ?int
     {
@@ -80,4 +80,5 @@ class Comment
 
         return $this;
     }
+
 }

@@ -136,6 +136,13 @@ class Trick
         return $this;
     }
 
+    public function addImage(string $image): self
+    {
+        $this->images[] = $image;
+
+        return $this;
+    }
+
     public function removeImage(string $image): void
     {
         $images = $this->getImages();
@@ -228,4 +235,5 @@ class Trick
 
         return $this;
     }
+    
 }

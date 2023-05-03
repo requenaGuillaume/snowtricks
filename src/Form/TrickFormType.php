@@ -8,6 +8,7 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
 
 class TrickFormType extends AbstractType
 {
@@ -19,6 +20,14 @@ class TrickFormType extends AbstractType
             ->add('category', EntityType::class, [
                 'class' => Group::class,
                 'choice_label' => 'title'
+            ])
+            ->add('images', FileType::class, [
+                'multiple' => true,
+                'required' => false,
+                'attr' => [
+                    'accept' => 'image/*',
+                    'multiple' => 'multiple'
+                ]
             ])
         ;
     }

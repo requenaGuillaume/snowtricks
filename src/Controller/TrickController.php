@@ -13,7 +13,9 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Finder\Finder;
 
 class TrickController extends AbstractController
 {
@@ -87,11 +89,38 @@ class TrickController extends AbstractController
             $edit = true;
         }
 
-        if(!$trick){
-            $trick = new Trick();
-        }
-
         $form = $this->createForm(TrickFormType::class, $trick);
+        $form->handleRequest($request);
+
+        if($form->isSubmitted() && $form->isValid()){
+            $images = $form['images']->getData();
+            $directory = __DIR__.'//../../public/assets/images/tricks';
+
+            $files = scandir($directory, SCANDIR_SORT_DESCENDING);
+            
+            // refacto -> getlastImageNumber
+            $latestImageNumber = 0;
+            foreach($files as $file){
+                $imageNumber = explode('.', $file)[0];
+
+                if($imageNumber > $latestImageNumber){
+                    $latestImageNumber = $imageNumber;
+                }
+            }
+
+            foreach($images as $image){
+                ++$latestImageNumber;
+                $extension = explode('.', $image->getClientOriginalName())[1];
+
+                /** @var UploadedFile $image */
+                $image->move($directory, "$latestImageNumber.$extension");
+
+                // TODO ajouter l'image au trick puis flusher !!
+            }
+
+            $this->addFlash('success', 'Trick has been successfully updated');
+            return $this->redirectToRoute('app_trick', ['slug' => $trick->getSlug()]);
+        }
         
         return $this->render('trick/create_or_edit.html.twig', [
             'form' => $form->createView(),
