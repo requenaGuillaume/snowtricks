@@ -16,6 +16,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Finder\Finder;
+use Symfony\Component\String\Slugger\AsciiSlugger;
 
 class TrickController extends AbstractController
 {
@@ -89,15 +90,26 @@ class TrickController extends AbstractController
             $edit = true;
         }
 
+        if(!$edit){
+            $trick = new Trick();
+        }       
+
+        // TODO : warning - weird
         $form = $this->createForm(TrickFormType::class, $trick);
-        $form->handleRequest($request);
+        $form->handleRequest($request); // le handleRequest me rajoute une image wtf ?
+
+        if(!$edit){
+            if($trick->getImages()[0]){
+                $trick->removeImage($trick->getImages()[0]);
+            }
+        }
 
         if($form->isSubmitted() && $form->isValid()){
-            $images = $form['images']->getData();
+            $formImages = $form['images']->getData();
             $directory = __DIR__.'//../../public/assets/images/tricks';
 
             $files = scandir($directory, SCANDIR_SORT_DESCENDING);
-            
+   
             // refacto -> getlastImageNumber
             $latestImageNumber = 0;
             foreach($files as $file){
@@ -108,17 +120,30 @@ class TrickController extends AbstractController
                 }
             }
 
-            foreach($images as $image){
+            foreach($formImages as $image){
                 ++$latestImageNumber;
                 $extension = explode('.', $image->getClientOriginalName())[1];
+                $imageName = "$latestImageNumber.$extension";
 
                 /** @var UploadedFile $image */
-                $image->move($directory, "$latestImageNumber.$extension");
-
-                // TODO ajouter l'image au trick puis flusher !!
+                $image->move($directory, $imageName);
+                $trick->addImage($imageName);
             }
 
-            $this->addFlash('success', 'Trick has been successfully updated');
+            if(!$edit){
+                $title = $form['title']->getData();
+                $slugger = new AsciiSlugger();
+                $slug = $slugger->slug(strtolower($title)); 
+                $trick->setSlug($slug)
+                    ->setCreatedAt(new DateTimeImmutable())
+                    ->setAuthor($this->getUser());
+                $this->em->persist($trick);
+                $this->addFlash('success', 'Trick has been successfully created');
+            }else{
+                $this->addFlash('success', 'Trick has been successfully updated');
+            }
+
+            $this->em->flush();
             return $this->redirectToRoute('app_trick', ['slug' => $trick->getSlug()]);
         }
         
