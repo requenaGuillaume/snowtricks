@@ -98,6 +98,12 @@ class TrickController extends AbstractController
 
         if($form->isSubmitted() && $form->isValid()){
             $formImages = $form['images']->getData();
+
+            if(!$edit && !$formImages){
+                $this->addFlash('error', 'You must choose at least one image for the trick');
+                return $this->redirectToRoute('app_trick_create');
+            }
+
             $directory = __DIR__.'//../../public/assets/images/tricks';
 
             $files = scandir($directory, SCANDIR_SORT_DESCENDING);
