@@ -178,6 +178,13 @@ class Trick
         return $this;
     }
 
+    public function addVideo(string $video): self
+    {
+        $this->videos[] = $video;
+
+        return $this;
+    }
+
     public function removeVideo(string $video): void
     {
         $videos = $this->getVideos();

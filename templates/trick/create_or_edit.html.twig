@@ -31,6 +31,9 @@
         {{ form_label(form.images, 'Images', {'label_attr': {'class': 'd-block text-center'}}) }}
         {{ form_widget(form.images, {'attr': {'class': 'form-control mb-2 mt-2'}}) }}
 
+        {{ form_label(form.video, 'Video (url)', {'label_attr': {'class': 'd-block text-center'}}) }}
+        {{ form_widget(form.video, {'attr': {'class': 'form-control mb-2 mt-2'}}) }}
+
         <button type="submit" class="btn btn-success">Submit</button>
     {{ form_end(form) }}
 

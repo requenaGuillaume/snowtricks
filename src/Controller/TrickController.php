@@ -97,10 +97,11 @@ class TrickController extends AbstractController
         $form->handleRequest($request);
 
         if($form->isSubmitted() && $form->isValid()){
+            // images
             $formImages = $form['images']->getData();
 
             if(!$edit && !$formImages){
-                $this->addFlash('error', 'You must choose at least one image for the trick');
+                $this->addFlash('danger', 'You must choose at least one image for the trick');
                 return $this->redirectToRoute('app_trick_create');
             }
 
@@ -131,6 +132,13 @@ class TrickController extends AbstractController
                 }
 
                 $trick->addImage($imageName);
+            }
+
+            // video
+            $formVideo = $form['video']->getData();
+
+            if($formVideo){
+                $trick->addVideo(str_replace('watch?v=', 'embed/',$formVideo ));
             }
 
             if(!$edit){
