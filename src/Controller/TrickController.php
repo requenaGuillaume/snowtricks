@@ -15,7 +15,6 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\Finder\Finder;
 use Symfony\Component\String\Slugger\AsciiSlugger;
 
 class TrickController extends AbstractController
@@ -25,7 +24,7 @@ class TrickController extends AbstractController
     {}
 
     #[Route('/trick/show/{slug}', name: 'app_trick', requirements: ['slug' => '[a-z0-9][a-z0-9-]{0,}[a-z0-9]'])]
-    public function show(Trick $trick, Request $request, CommentRepository $commentRepository): Response
+    public function show(?Trick $trick, Request $request, CommentRepository $commentRepository): Response
     {
         if(!$trick){
             $this->addFlash('danger', 'Trick page not found.');
@@ -94,15 +93,8 @@ class TrickController extends AbstractController
             $trick = new Trick();
         }       
 
-        // TODO : warning - weird
         $form = $this->createForm(TrickFormType::class, $trick);
-        $form->handleRequest($request); // le handleRequest me rajoute une image wtf ?
-
-        if(!$edit){
-            if($trick->getImages()[0]){
-                $trick->removeImage($trick->getImages()[0]);
-            }
-        }
+        $form->handleRequest($request);
 
         if($form->isSubmitted() && $form->isValid()){
             $formImages = $form['images']->getData();
@@ -110,7 +102,7 @@ class TrickController extends AbstractController
 
             $files = scandir($directory, SCANDIR_SORT_DESCENDING);
    
-            // refacto -> getlastImageNumber
+            // TODO refacto -> getlastImageNumber
             $latestImageNumber = 0;
             foreach($files as $file){
                 $imageNumber = explode('.', $file)[0];
@@ -127,6 +119,11 @@ class TrickController extends AbstractController
 
                 /** @var UploadedFile $image */
                 $image->move($directory, $imageName);
+
+                if(!$edit){
+                    $trick->setImages([]); // weird too xd
+                }
+
                 $trick->addImage($imageName);
             }
 
@@ -146,7 +143,6 @@ class TrickController extends AbstractController
             $this->em->flush();
             return $this->redirectToRoute('app_trick', ['slug' => $trick->getSlug()]);
         }
-        
         return $this->render('trick/create_or_edit.html.twig', [
             'form' => $form->createView(),
             'edit' => $edit,

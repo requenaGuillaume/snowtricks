@@ -24,6 +24,7 @@ class TrickFormType extends AbstractType
             ->add('images', FileType::class, [
                 'multiple' => true,
                 'required' => false,
+                'mapped' => false,
                 'attr' => [
                     'accept' => 'image/*',
                     'multiple' => 'multiple'
