@@ -98,6 +98,7 @@
                         let confirm = window.confirm('Confirm you want to delete this image.');
 
                         if(confirm){
+                            console.log(slug, image);
                             let request = new Request(`https://127.0.0.1:8000/trick/edit/${slug}/remove-image/${image}`, init);
     
                             fetch(request).then(function(response){
