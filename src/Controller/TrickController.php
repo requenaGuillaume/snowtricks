@@ -37,6 +37,10 @@ class TrickController extends AbstractController
         $otherImages = [];
 
         for($i = 1; $i < count($allImages); ++$i){
+            if(!array_key_exists($i, $allImages)){
+                continue;
+            }
+
             $otherImages[] = $allImages[$i];
         }
 
@@ -109,16 +113,8 @@ class TrickController extends AbstractController
             $directory = __DIR__.'//../../public/assets/images/tricks';
 
             $files = scandir($directory, SCANDIR_SORT_DESCENDING);
-   
-            // TODO refacto -> getlastImageNumber
-            $latestImageNumber = 0;
-            foreach($files as $file){
-                $imageNumber = explode('.', $file)[0];
 
-                if($imageNumber > $latestImageNumber){
-                    $latestImageNumber = $imageNumber;
-                }
-            }
+            $latestImageNumber = $this->getLastImageNumber($files);
 
             foreach($formImages as $image){
                 ++$latestImageNumber;
@@ -228,5 +224,20 @@ class TrickController extends AbstractController
         $this->em->flush();
 
         return new JsonResponse();
+    }
+
+    private function getLastImageNumber(array|bool $files): int
+    {
+        $latestImageNumber = 0;
+
+        foreach($files as $file){
+            $imageNumber = explode('.', $file)[0];
+
+            if($imageNumber > $latestImageNumber){
+                $latestImageNumber = $imageNumber;
+            }
+        }
+
+        return $latestImageNumber;
     }
 }
