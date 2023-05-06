@@ -32,7 +32,6 @@ class TrickController extends AbstractController
             return $this->redirectToRoute('app_home');
         }
 
-        // TODO fix bug, sometime i upload an image and it doesn appear int the show
         $allImages = $trick->getImages();
         $mainImage = reset($allImages);
         $otherImages = [];
