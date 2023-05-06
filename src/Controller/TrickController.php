@@ -164,6 +164,19 @@ class TrickController extends AbstractController
         ]);
     }
 
+    #[Route('/trick/delete/{slug}', 
+        name: 'app_trick_delete', 
+        requirements: ['slug' => '[a-z0-9][a-z0-9-]{0,}[a-z0-9]']
+    )]
+    public function delete(): Response
+    {
+        // Remove trick
+
+        // Maybe must remove comments before remove tricks
+
+        return new Response();
+    }
+
     #[Route('/trick/edit/{slug}/remove-image/{image}', 
         name: 'app_trick_remove_image', 
         requirements: ['slug' => '[a-z0-9][a-z0-9-]{0,}[a-z0-9]', 'image' => '\d+\.{1}(jpg|jpeg|png)']
