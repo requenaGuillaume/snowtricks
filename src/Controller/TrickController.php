@@ -32,16 +32,16 @@ class TrickController extends AbstractController
             return $this->redirectToRoute('app_home');
         }
 
+        // TODO fix bug, sometime i upload an image and it doesn appear int the show
         $allImages = $trick->getImages();
-        $mainImage = $allImages[0];
+        $mainImage = reset($allImages);
         $otherImages = [];
 
-        for($i = 1; $i < count($allImages); ++$i){
-            if(!array_key_exists($i, $allImages)){
-                continue;
+        for($i = 1; $i <= count($allImages); ++$i){
+            $otherImages = $allImages;
+            if (($key = array_search($mainImage, $otherImages)) !== false) {
+                unset($otherImages[$key]);
             }
-
-            $otherImages[] = $allImages[$i];
         }
 
         $form = $this->createForm(CommentFormType::class);
@@ -83,6 +83,7 @@ class TrickController extends AbstractController
     #[Route('/trick/edit/{slug}', name: 'app_trick_edit', requirements: ['slug' => '[a-z0-9][a-z0-9-]{0,}[a-z0-9]'])]
     public function createOrEdit(?Trick $trick = null, Request $request): Response
     {
+        // TODO isGranted or something (for many route, not just this one)
         $edit = false;
 
         if($request->attributes->get('_route') === 'app_trick_edit'){
@@ -110,6 +111,7 @@ class TrickController extends AbstractController
                 return $this->redirectToRoute('app_trick_create');
             }
 
+            // TODO change dir value
             $directory = __DIR__.'//../../public/assets/images/tricks';
 
             $files = scandir($directory, SCANDIR_SORT_DESCENDING);
@@ -125,7 +127,7 @@ class TrickController extends AbstractController
                 $image->move($directory, $imageName);
 
                 if(!$edit){
-                    $trick->setImages([]); // weird too xd
+                    $trick->setImages([]);
                 }
 
                 $trick->addImage($imageName);
@@ -179,6 +181,11 @@ class TrickController extends AbstractController
 
         $trick->removeImage($image);
         $this->em->flush();
+
+        // TODO change dir value
+        unlink(__DIR__."//../../public/assets/images/tricks/$image");
+
+        // TODO add gitignore to tricks image folder
 
         return new JsonResponse();
     }
