@@ -16,12 +16,18 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\String\Slugger\AsciiSlugger;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class TrickController extends AbstractController
 {
 
-    public function __construct(private EntityManagerInterface $em)
+    public function __construct(
+        private EntityManagerInterface $em,
+
+        #[Autowire('%kernel.project_dir%/public/assets/images/tricks')]
+        private $dir
+    )
     {}
 
     #[Route('/trick/show/{slug}', name: 'app_trick', requirements: ['slug' => '[a-z0-9][a-z0-9-]{0,}[a-z0-9]'])]
@@ -110,11 +116,7 @@ class TrickController extends AbstractController
                 return $this->redirectToRoute('app_trick_create');
             }
 
-            // TODO change dir value
-            $directory = __DIR__.'//../../public/assets/images/tricks';
-
-            $files = scandir($directory, SCANDIR_SORT_DESCENDING);
-
+            $files = scandir($this->dir, SCANDIR_SORT_DESCENDING);
             $latestImageNumber = $this->getLastImageNumber($files);
 
             foreach($formImages as $image){
@@ -123,7 +125,7 @@ class TrickController extends AbstractController
                 $imageName = "$latestImageNumber.$extension";
 
                 /** @var UploadedFile $image */
-                $image->move($directory, $imageName);
+                $image->move($this->dir, $imageName);
 
                 if(!$edit){
                     $trick->setImages([]);
@@ -181,10 +183,7 @@ class TrickController extends AbstractController
         $trick->removeImage($image);
         $this->em->flush();
 
-        // TODO change dir value
-        unlink(__DIR__."//../../public/assets/images/tricks/$image");
-
-        // TODO add gitignore to tricks image folder
+        unlink("{$this->dir}/$image");
 
         return new JsonResponse();
     }
