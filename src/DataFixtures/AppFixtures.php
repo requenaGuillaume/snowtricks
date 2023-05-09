@@ -80,7 +80,7 @@ class AppFixtures extends Fixture
         [
             'title' => 'japan air',
             'description' => '“Japan Air” is the name of a trick in which the airborne athlete takes his front hand, reaches down over his front leg to grab the edge of his snowboard nearest to his toes—the “toe edge”—and then pulls the board behind him.',
-            'photos' => ['15.jpg', '16.png'],
+            'photos' => ['15.jpg', '16.jpg'],
             'videos' => ['https://www.youtube.com/embed/jH76540wSqU']
         ],
         [

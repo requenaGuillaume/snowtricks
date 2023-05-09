@@ -168,13 +168,17 @@ class TrickController extends AbstractController
         name: 'app_trick_delete', 
         requirements: ['slug' => '[a-z0-9][a-z0-9-]{0,}[a-z0-9]']
     )]
-    public function delete(): Response
+    public function delete(Trick $trick): Response
     {
-        // Remove trick
+        foreach($trick->getImages() as $image){
+            unlink("{$this->dir}/$image");
+        }
 
-        // Maybe must remove comments before remove tricks
+        $this->em->remove($trick);
+        $this->em->flush();
 
-        return new Response();
+        $this->addFlash('success', 'The trick has been deleted');
+        return $this->redirectToRoute('app_home');
     }
 
     #[Route('/trick/edit/{slug}/remove-image/{image}', 
