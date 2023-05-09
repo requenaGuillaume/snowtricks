@@ -39,7 +39,7 @@ class TrickController extends AbstractController
         }
 
         $allImages = $trick->getImages();
-        $mainImage = reset($allImages);
+        $mainImage = $trick->getMainImage();
         $otherImages = [];
 
         for($i = 1; $i <= count($allImages); ++$i){

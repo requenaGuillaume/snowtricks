@@ -166,6 +166,12 @@ class Trick
         return $this;
     }
 
+    public function getMainImage(): string
+    {
+        $images = $this->getImages();
+        return reset($images);
+    }
+
     public function getVideos(): array
     {
         return $this->videos;
