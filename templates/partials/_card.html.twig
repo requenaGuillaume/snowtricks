@@ -11,7 +11,7 @@
           {{ trick.title | capitalize }}
         </a>
     </h5>
-    <a href="#" class="btn">
+    <a href="{{ path('app_trick_edit', {'slug': trick.slug}) }}" class="btn">
         <i class="fa-solid fa-pencil"></i>
     </a>
     <a href="{{ path('app_trick_delete', {'slug': trick.slug}) }}" class="btn">
