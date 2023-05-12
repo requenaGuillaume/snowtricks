@@ -136,6 +136,42 @@ class Trick
         return $this;
     }
 
+    public function addImage(string $image): self
+    {
+        $this->images[] = $image;
+
+        return $this;
+    }
+
+    public function removeImage(string $image): void
+    {
+        $images = $this->getImages();
+        if (($key = array_search($image, $images)) !== false) {
+            unset($images[$key]);
+        }
+
+        $this->setImages($images);
+    }
+
+    public function setMainImage(string $image): self
+    {        
+        if(in_array($image, $this->getImages())){
+            $this->removeImage($image);
+        }
+
+        $images = $this->getImages();
+        array_unshift($images, $image);
+        $this->setImages($images);
+
+        return $this;
+    }
+
+    public function getMainImage(): string
+    {
+        $images = $this->getImages();
+        return reset($images);
+    }
+
     public function getVideos(): array
     {
         return $this->videos;
@@ -146,6 +182,23 @@ class Trick
         $this->videos = $videos;
 
         return $this;
+    }
+
+    public function addVideo(string $video): self
+    {
+        $this->videos[] = $video;
+
+        return $this;
+    }
+
+    public function removeVideo(string $video): void
+    {
+        $videos = $this->getVideos();
+        if (($key = array_search($video, $videos)) !== false) {
+            unset($videos[$key]);
+        }
+
+        $this->setVideos($videos);
     }
 
     public function getAuthor(): ?User
@@ -195,4 +248,5 @@ class Trick
 
         return $this;
     }
+    
 }
