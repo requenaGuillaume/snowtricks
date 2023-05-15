@@ -155,8 +155,9 @@ class TrickController extends AbstractController
             }
 
             $this->em->flush();
-            return $this->redirectToRoute('app_trick', ['slug' => $trick->getSlug()]);
+            return $this->redirectToRoute('app_home');
         }
+
         return $this->render('trick/create_or_edit.html.twig', [
             'form' => $form->createView(),
             'edit' => $edit,
