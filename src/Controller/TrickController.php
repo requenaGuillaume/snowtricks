@@ -71,19 +71,11 @@ class TrickController extends AbstractController
             $this->em->flush();
 
             $this->addFlash('success', 'Your comment has been sent');
-        }
-
-        // $comments = $commentRepository->findBy([
-        //         'trick' => $trick
-        //     ],
-        //     [
-        //         'createdAt' => 'DESC'
-        //     ]
-        // );        
+        }       
 
         $pagination = $paginator->paginate(
             $commentRepository->findPaginationQuery($trick),
-            $request->query->get('page'),
+            $request->query->get('page', 1),
             10
         );
 

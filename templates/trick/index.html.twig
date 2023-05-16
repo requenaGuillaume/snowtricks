@@ -2,6 +2,41 @@
 
 {% block stylesheets %}
     <style>
+        .pagination{
+            justify-content: center;
+        }
+        .current{
+            padding: 0.4rem;
+            border: 1px solid black;
+            background-color : #8e9e93;
+            color: rgb(33,37,41);
+        }
+        .first,
+        .previous,
+        .page,
+        .next,
+        .last{
+            padding: 0.2rem;
+            border: 1px solid black;
+            background-color : #6c7a70;
+        }
+        .first,
+        .previous,
+        .page,
+        .next,
+        .last,
+        .current{
+            margin-left: 0.1rem;
+        }
+        .first a,
+        .previous a,
+        .page a,
+        .next a,
+        .last a{
+            padding: 0.2rem;
+            color: white;
+            text-decoration: none;
+        }
         .bg-image{
             background-size: cover;
             background-position: center;
