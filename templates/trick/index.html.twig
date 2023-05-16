@@ -99,7 +99,7 @@
     {% endif %}
 
     <div class="w-75 mb-4" style="margin: 0 auto;">
-        {% for comment in comments %}
+        {% for comment in pagination %}
             {% if comment.author.photo is null %}
                 {% set photo = 'snowtricks.png' %}
                 {% set alt = 'Snowtricks logo' %}
@@ -116,6 +116,8 @@
             </div>
         {% endfor %}
     </div>
+
+    {{ knp_pagination_render(pagination) }}
     
 {% endblock %}
 
