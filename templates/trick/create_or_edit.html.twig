@@ -21,18 +21,23 @@
     {{ form_start(form) }}
         {{ form_label(form.title, 'Title', {'label_attr': {'class': 'd-block text-center'}}) }}
         {{ form_widget(form.title, {'attr': {'class': 'form-control mb-2 mt-2'}}) }}
+        {{ form_errors(form.title) }}
 
         {{ form_label(form.description, 'Description', {'label_attr': {'class': 'd-block text-center'}}) }}
         {{ form_widget(form.description, {'attr': {'class': 'form-control mb-2 mt-2'}}) }}
+        {{ form_errors(form.description) }}
 
         {{ form_label(form.category, 'Group', {'label_attr': {'class': 'd-block text-center'}}) }}
         {{ form_widget(form.category, {'attr': {'class': 'form-control mb-2 mt-2'}}) }}
+        {{ form_errors(form.category) }}
 
         {{ form_label(form.images, 'Images', {'label_attr': {'class': 'd-block text-center'}}) }}
         {{ form_widget(form.images, {'attr': {'class': 'form-control mb-2 mt-2'}}) }}
+        {{ form_errors(form.images) }}
 
         {{ form_label(form.video, 'Video (url)', {'label_attr': {'class': 'd-block text-center'}}) }}
         {{ form_widget(form.video, {'attr': {'class': 'form-control mb-2 mt-2'}}) }}
+        {{ form_errors(form.video) }}
 
         <button type="submit" class="btn btn-success">Submit</button>
     {{ form_end(form) }}
