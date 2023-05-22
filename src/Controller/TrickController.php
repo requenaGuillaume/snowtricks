@@ -19,6 +19,7 @@ use Symfony\Component\String\Slugger\AsciiSlugger;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 
 class TrickController extends AbstractController
 {
@@ -88,11 +89,11 @@ class TrickController extends AbstractController
         ]);
     }
 
+    #[IsGranted('ROLE_USER')]
     #[Route('/trick/create', name: 'app_trick_create')]
     #[Route('/trick/edit/{slug}', name: 'app_trick_edit', requirements: ['slug' => '[a-z0-9][a-z0-9-]{0,}[a-z0-9]'])]
     public function createOrEdit(?Trick $trick = null, Request $request): Response
     {
-        // TODO isGranted or something (for many route, not just this one)
         $edit = false;
 
         if($request->attributes->get('_route') === 'app_trick_edit'){
@@ -169,8 +170,9 @@ class TrickController extends AbstractController
         ]);
     }
 
-    #[Route('/trick/delete/{slug}', 
-        name: 'app_trick_delete', 
+    #[IsGranted('ROLE_USER')]
+    #[Route('/trick/delete/{slug}',
+        name: 'app_trick_delete',
         requirements: ['slug' => '[a-z0-9][a-z0-9-]{0,}[a-z0-9]']
     )]
     public function delete(Trick $trick): Response
@@ -186,6 +188,7 @@ class TrickController extends AbstractController
         return $this->redirectToRoute('app_home');
     }
 
+    #[IsGranted('ROLE_USER')]
     #[Route('/trick/edit/{slug}/remove-image/{image}', 
         name: 'app_trick_remove_image', 
         requirements: ['slug' => '[a-z0-9][a-z0-9-]{0,}[a-z0-9]', 'image' => '\d+\.{1}(jpg|jpeg|png)']
@@ -210,6 +213,7 @@ class TrickController extends AbstractController
         return new JsonResponse();
     }
 
+    #[IsGranted('ROLE_USER')]
     #[Route('/trick/edit/{slug}/main-image/{image}', 
         name: 'app_trick_main_image', 
         requirements: ['slug' => '[a-z0-9][a-z0-9-]{0,}[a-z0-9]', 'image' => '\d+\.{1}(jpg|jpeg|png)']
@@ -228,7 +232,7 @@ class TrickController extends AbstractController
         return new JsonResponse();
     }
 
-
+    #[IsGranted('ROLE_USER')]
     #[Route('/trick/edit/{slug}/remove-video/{videoIndex}', 
         name: 'app_trick_remove_video',
         requirements: ['slug' => '[a-z0-9][a-z0-9-]{0,}[a-z0-9]', 'videoIndex' => '\d+']
@@ -267,4 +271,5 @@ class TrickController extends AbstractController
 
         return $latestImageNumber;
     }
+
 }
