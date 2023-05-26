@@ -35,9 +35,10 @@
         tempora ex provident veniam doloremque numquam. Minima, cumque aperiam debitis illum ab vel ad quidem! Deleniti 
         veritatis tempore similique? Obcaecati, laboriosam qui!
     </p>
-    <div class="d-flex flex-row flex-wrap justify-content-between p-2 bd-highlight mb-4">
+
+    <div class="d-flex flex-row flex-wrap p-2 bd-highlight mb-4">
         {% for trick in tricks %}
-            {% include "partials/_card.html.twig" with {'trick': trick} only %}            
+            {% include "partials/_card.html.twig" with {'trick': trick} only %}
         {% endfor %}
     </div>
 
