@@ -14,6 +14,9 @@
         .trash{
             color: red;
         }
+        #medias div:not(:last-child){
+            margin-right: 1rem;
+        }
         .pagination{
             justify-content: center;
         }
@@ -104,7 +107,7 @@
 
     <button id="mobile" class="d-sm-none d-block w-50 btn btn-primary">See medias</button>
 
-    <div id="medias" class="d-flex justify-content-between hide">
+    <div id="medias" class="d-flex hide">
         {% set imageNumber = 1 %}
         {% for image in otherImages %}
             <div class="mb-4" style="width: 20%; height: 100px;">
