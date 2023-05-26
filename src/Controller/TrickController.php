@@ -10,6 +10,7 @@ use App\Form\TrickFormType;
 use App\Form\CommentFormType;
 use App\Repository\CommentRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -31,7 +32,12 @@ class TrickController extends AbstractController
     {}
 
     #[Route('/trick/show/{slug}', name: 'app_trick', requirements: ['slug' => '[a-z0-9][a-z0-9-]{0,}[a-z0-9]'])]
-    public function show(?Trick $trick, Request $request, CommentRepository $commentRepository): Response
+    public function show(
+        ?Trick $trick, 
+        Request $request, 
+        CommentRepository $commentRepository, 
+        PaginatorInterface $paginator
+    ): Response
     {
         if(!$trick){
             $this->addFlash('danger', 'Trick page not found.');
@@ -65,14 +71,12 @@ class TrickController extends AbstractController
             $this->em->flush();
 
             $this->addFlash('success', 'Your comment has been sent');
-        }
+        }       
 
-        $comments = $commentRepository->findBy([
-                'trick' => $trick
-            ],
-            [
-                'createdAt' => 'DESC'
-            ]
+        $pagination = $paginator->paginate(
+            $commentRepository->findPaginationQuery($trick),
+            $request->query->get('page', 1),
+            10
         );
 
         return $this->render('trick/index.html.twig', [
@@ -80,7 +84,7 @@ class TrickController extends AbstractController
             'mainImage' => $mainImage,
             'otherImages' => $otherImages,
             'commentForm' => $form->createView(),
-            'comments' => $comments
+            'pagination' => $pagination
         ]);
     }
 
