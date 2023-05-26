@@ -5,6 +5,15 @@
         h1{            
             text-shadow: 1px 1px 3px black;
         }
+        .title{
+            height: 80%;
+        }
+        .edit{
+            color: green;
+        }
+        .trash{
+            color: red;
+        }
         .pagination{
             justify-content: center;
         }
@@ -74,9 +83,23 @@
 {% block title %}{{ trick.title | capitalize }}{% endblock %}
 
 {% block body %}
-    <div class="bg-image d-flex align-items-center justify-content-center mb-4" 
+    <div class="bg-image mb-4 d-flex flex-column flex-wrap" 
         style="background-image: url('https://127.0.0.1:8000/assets/images/tricks/{{mainImage}}')">
-        <h1 class="text-center">{{ trick.title | capitalize }}</h1>
+
+        {% if app.user %}
+        <div class="text-end w-100">
+            <a href="{{ path('app_trick_edit', {'slug': trick.slug}) }}" class="btn edit">
+                <i class="fa-solid fa-pencil"></i>
+            </a>
+            <a href="{{ path('app_trick_delete', {'slug': trick.slug}) }}" class="btn trash">
+                <i class="fa-solid fa-trash-can"></i>
+            </a>
+        </div>
+        {% endif %}
+
+        <div class="d-flex align-items-center w-100 title">
+            <h1 class="w-100 text-center">{{ trick.title | capitalize }}</h1>
+        </div>
     </div>
 
     <button id="mobile" class="d-sm-none d-block w-50 btn btn-primary">See medias</button>
