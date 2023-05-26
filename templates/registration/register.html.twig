@@ -37,5 +37,9 @@
         <button type="submit" class="btn btn-primary" style="margin-left: 50%; transform: translateX(-50%);">
             Create an account
         </button>
+
+        <p class="text-center mt-2">
+            <a href="{{ path('app_login') }}">Already an account ?</a>
+        </p>
     {{ form_end(registrationForm) }}
 {% endblock %}
