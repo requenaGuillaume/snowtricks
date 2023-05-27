@@ -200,6 +200,11 @@ class TrickController extends AbstractController
             return new JsonResponse(null, 404);
         }
 
+        if($trick->getMainImage() === $image){
+            $this->addFlash('danger', 'You cannot delete the main image');
+            return new JsonResponse(null, 403);
+        }
+
         if(!in_array($image, $trick->getImages())){
             $this->addFlash('danger', 'This trick does not have this image');
             return new JsonResponse(null, 404);
