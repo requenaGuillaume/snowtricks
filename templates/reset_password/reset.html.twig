@@ -2,11 +2,33 @@
 
 {% block title %}Reset your password{% endblock %}
 
-{% block body %}
-    <h1>Reset your password</h1>
+{% block stylesheets %}
+    <style>
+        label{
+            display: block;
+            text-align: center;
+        }
 
-    {{ form_start(resetForm) }}
+        @media screen and (max-width: 768px){
+           form{
+                width: 70% !important;
+                margin: 0 auto;
+            }
+
+            form button{
+                width: 80%;
+            }
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+    <h1 class="text-center">Reset your password</h1>
+
+    {{ form_start(resetForm, {'attr': {'class': 'col-4 mx-auto mt-5 mb-5'}}) }}
         {{ form_row(resetForm.plainPassword) }}
-        <button class="btn btn-primary">Reset password</button>
+        <button class="btn btn-primary w-50 mt-2" style="margin-left: 50%; transform: translateX(-50%);">
+            Reset password
+        </button>
     {{ form_end(resetForm) }}
 {% endblock %}
