@@ -63,11 +63,11 @@
                     >
                     <div class="d-flex justify-content-between">
                         {% if index > 0 %}
-                            <button id="main-{{image}}" class="btn btn-primary mt-2 w-75">Main image</button>
-                        {% endif %}
+                        <button id="main-{{image}}" class="btn btn-primary mt-2 w-75">Main image</button>
                         <button id="delete-{{image}}" class="btn btn-danger mt-2 float-end">
                             <i class="fa-solid fa-trash"></i>
                         </button>
+                        {% endif %}
                     </div>
                 </div>
                 {% set index = index + 1 %}
