@@ -1,5 +1,13 @@
 {% extends 'base.html.twig' %}
 
+{% block stylesheets %}
+    <style>
+        button{
+            font-size: 0.8rem !important;
+        }
+    </style>
+{% endblock %}
+
 {% block title %}
     {% if edit %}
         Edit
@@ -48,17 +56,19 @@
             {% for image in trick.images %}
                 <div id="{{image}}" class="p-2" style="width: 20%; height: 12rem; overflow: hidden;">
                     <img src="https://127.0.0.1:8000/assets/images/tricks/{{image}}"
-                        alt=""
-                        style="width: 100%;"
-                        class="js-images"
+                        alt="{{ trick.title }} {{index}}"
+                        style="height: 70%;"
+                        class="js-images w-100"
                         data-image={{image}}
                     >
-                    {% if index > 0 %}
-                        <btn id="main-{{image}}" class="btn btn-primary mt-2">Set as main image</btn>
-                    {% endif %}
-                    <btn id="delete-{{image}}" class="btn btn-danger mt-2 float-end">
-                        <i class="fa-solid fa-trash"></i>
-                    </btn>
+                    <div class="d-flex justify-content-between">
+                        {% if index > 0 %}
+                            <button id="main-{{image}}" class="btn btn-primary mt-2 w-75">Main image</button>
+                        {% endif %}
+                        <button id="delete-{{image}}" class="btn btn-danger mt-2 float-end">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </div>
                 </div>
                 {% set index = index + 1 %}
             {% endfor %}
@@ -75,9 +85,9 @@
                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
                         allowfullscreen>
                     </iframe>
-                    <btn class="js-videos btn btn-danger mt-2 float-end">
+                    <button class="js-videos btn btn-danger mt-2 float-end">
                         <i class="fa-solid fa-trash"></i>
-                    </btn>
+                    </button>
                 </div>
                 {% set index = index + 1 %}
             {% endfor %}
