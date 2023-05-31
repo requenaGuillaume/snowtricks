@@ -5,6 +5,14 @@
         #bottom-arrow i:hover{
             color: blue !important;
         }
+        
+        .hidden{
+            display: none !important;
+        }
+
+        #arrowUp{
+            display: none;
+        }
 
         @media screen and (max-width: 991px){
            body .container p + .d-flex .card{
@@ -36,18 +44,59 @@
         veritatis tempore similique? Obcaecati, laboriosam qui!
     </p>
 
-    <div class="d-flex flex-row flex-wrap p-2 bd-highlight mb-4">
+
+    <div class="text-end position-relative pb-4">
+        <a href="#tricks" class="fs-1">
+            <i class="fa-solid fa-arrow-down text-light position-absolute end-2">
+            </i>
+        </a>
+    </div>
+
+    <div class="d-flex flex-row flex-wrap p-2 bd-highlight mb-4" id="tricks">
+        {% set count = 1 %}
         {% for trick in tricks %}
-            {% include "partials/_card.html.twig" with {'trick': trick} only %}
+            {% include "partials/_card.html.twig" with {'trick': trick, 'count': count} only %}
+            {% set count = count + 1 %}
         {% endfor %}
     </div>
 
+    {# #arrow #}
     {% if tricksCount > 15 %}
-        <div class="text-end position-relative pb-4">
-            <a href="#top" class="fs-1" id="bottom-arrow">
+        <button id="loader" class="btn btn-success d-block w-25 mx-auto">Load more</button>
+        <div id="arrowUp" class="text-end position-relative pb-4">
+            <a href="#top" class="fs-1">
                 <i class="fa-solid fa-arrow-up text-light position-absolute end-2">
                 </i>
             </a>
         </div>
-    {% endif %}    
+    {% endif %}
+    
+{% endblock %}
+
+{% block javascripts %}
+    <script>
+        {# TODO fix bug, loop iterate 1 time instead of 2 ? #}
+        const hiddenCards = document.getElementsByClassName('hidden');
+        console.log(hiddenCards);
+        const count = hiddenCards.length;
+        console.log(count);
+
+        if(count > 0){
+            const loadMore = document.getElementById('loader');
+            let i = 1;
+            loadMore.addEventListener('click', function(){
+                for(card of hiddenCards)
+                {
+                    console.log(card);
+                    console.log(i + ' tour /' + count);
+
+                    card.classList.remove('hidden');
+                    i++;
+                }
+                
+                loadMore.classList.add('hidden');
+                document.getElementById('arrowUp').style.display = "inherit";
+            });
+        }
+    </script>
 {% endblock %}
