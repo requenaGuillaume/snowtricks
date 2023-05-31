@@ -77,10 +77,19 @@
         button{
             margin: 0 auto;
         }
+        #see-media{
+            display: none;
+        }
 
-        @media screen and (max-width: 575px){
+        @media screen and (max-width: 768px){
+            #see-media{
+                display: initial;
+            }
             .hide{
                 display: none !important;
+            }
+            form{
+                width: 140%;
             }
         }
     </style>
@@ -108,7 +117,9 @@
         </div>
     </div>
 
-    <button id="mobile" class="d-sm-none d-block w-50 btn btn-primary">See medias</button>
+    <div class="text-center">
+        <button id="see-media" class="btn btn-primary text w-25 mb-4">See media</button>
+    </div>
 
     <div id="medias" class="d-flex hide">
         {% set imageNumber = 1 %}
@@ -191,12 +202,20 @@
 
 {% block javascripts %}
     <script>
-        const mediaButton = document.getElementById('mobile');
-        const medias = document.getElementById('medias');
+        // const mediaButton = document.getElementById('mobile');
+        // const medias = document.getElementById('medias');
+
+        // mediaButton.addEventListener('click', () => {
+        //     medias.classList.remove('hide');
+        //     mediaButton.classList.add('hide');
+        // });
+
+        const mediaButton = document.getElementById('see-media');
 
         mediaButton.addEventListener('click', () => {
             medias.classList.remove('hide');
-            mediaButton.classList.add('hide');
+            mediaButton.style.display = 'none';
         });
+
     </script>
 {% endblock %}
