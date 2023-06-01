@@ -75,25 +75,17 @@
 
 {% block javascripts %}
     <script>
-        {# TODO fix bug, loop iterate 1 time instead of 2 ? #}
         const hiddenCards = document.getElementsByClassName('hidden');
-        console.log(hiddenCards);
-        const count = hiddenCards.length;
-        console.log(count);
+        const cards = Array.from(hiddenCards);
 
-        if(count > 0){
+        if(cards.length > 0){
             const loadMore = document.getElementById('loader');
-            let i = 1;
-            loadMore.addEventListener('click', function(){
-                for(card of hiddenCards)
-                {
-                    console.log(card);
-                    console.log(i + ' tour /' + count);
 
+            loadMore.addEventListener('click', function(){                
+                for(card of cards){
                     card.classList.remove('hidden');
-                    i++;
                 }
-                
+
                 loadMore.classList.add('hidden');
                 document.getElementById('arrowUp').style.display = "inherit";
             });
