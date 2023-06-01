@@ -14,6 +14,12 @@
             display: none;
         }
 
+        @media screen and (max-width: 1200px){
+            .card{
+                width: 30%;
+            }
+        }
+
         @media screen and (max-width: 991px){
            body .container p + .d-flex .card{
                 width: 30% !important;
@@ -21,9 +27,8 @@
         }
 
         @media screen and (max-width: 768px){
-           body .container p + .d-flex .card{
-                width: 90% !important;
-                margin: 0 auto;
+            .card{
+                width: 90%;
             }
         }
     </style>
