@@ -49,8 +49,9 @@ class TrickController extends AbstractController
         $mainImage = $trick->getMainImage();
         $otherImages = [];
 
+        // Pour l'affichage, on separe la main image des autres images
         for($i = 1; $i <= count($allImages); ++$i){
-            $otherImages = $allImages;
+            $otherImages = $allImages; // A mettre en dehors de la boucle ?
             if (($key = array_search($mainImage, $otherImages)) !== false) {
                 unset($otherImages[$key]);
             }
@@ -59,6 +60,7 @@ class TrickController extends AbstractController
         $form = $this->createForm(CommentFormType::class);
         $form->handleRequest($request);
 
+        // Creation de commentaires
         if ($form->isSubmitted() && $form->isValid()) {
             $content = $form->get('content')->getData();
 
@@ -113,7 +115,7 @@ class TrickController extends AbstractController
         $form->handleRequest($request);
 
         if($form->isSubmitted() && $form->isValid()){
-            // images
+
             $formImages = $form['images']->getData();
 
             if(!$edit && !$formImages){
@@ -121,17 +123,21 @@ class TrickController extends AbstractController
                 return $this->redirectToRoute('app_trick_create');
             }
 
+            // On recup la derniere image pour pouvoir savoir comment nommer les suivantes (increment de 1)
             $files = scandir($this->dir, SCANDIR_SORT_DESCENDING);
             $latestImageNumber = $this->getLastImageNumber($files);
 
             foreach($formImages as $image){
+                // On renome chaque image avec un +1
                 ++$latestImageNumber;
                 $extension = explode('.', $image->getClientOriginalName())[1];
                 $imageName = "$latestImageNumber.$extension";
 
+                // On la place dans le dossier souhaité
                 /** @var UploadedFile $image */
                 $image->move($this->dir, $imageName);
 
+                // On ajoute l'image au trick
                 if(!$edit){
                     $trick->setImages([]);
                 }
@@ -139,7 +145,7 @@ class TrickController extends AbstractController
                 $trick->addImage($imageName);
             }
 
-            // video
+            // video - remplace dans l'url
             $formVideo = $form['video']->getData();
 
             if($formVideo){
@@ -147,6 +153,7 @@ class TrickController extends AbstractController
             }
 
             if(!$edit){
+                // On rempli la new Trick()
                 $title = $form['title']->getData();
                 $slugger = new AsciiSlugger();
                 $slug = $slugger->slug(strtolower($title)); 
@@ -177,6 +184,7 @@ class TrickController extends AbstractController
     )]
     public function delete(Trick $trick): Response
     {
+        // On supprime toutes les images d'une trick
         foreach($trick->getImages() as $image){
             unlink("{$this->dir}/$image");
         }
@@ -195,6 +203,7 @@ class TrickController extends AbstractController
     )]
     public function removeImage(Trick $trick, string $image): JsonResponse
     {
+        // Gestion d'erreur
         if(!$trick){
             $this->addFlash('danger', 'Trick not found');
             return new JsonResponse(null, 404);
@@ -210,6 +219,7 @@ class TrickController extends AbstractController
             return new JsonResponse(null, 404);
         }
 
+        // On supprime une image
         $trick->removeImage($image);
         $this->em->flush();
 
@@ -224,7 +234,8 @@ class TrickController extends AbstractController
         requirements: ['slug' => '[a-z0-9][a-z0-9-]{0,}[a-z0-9]', 'image' => '\d+\.{1}(jpg|jpeg|png)']
     )]
     public function setMainImage(Trick $trick, string $image): JsonResponse
-    {        
+    {
+        //  Gestion d'erreur
         if(!$trick){
             $this->addFlash('danger', 'Trick not found');
             return new JsonResponse(null, 404);
@@ -244,13 +255,15 @@ class TrickController extends AbstractController
     )]
     public function removeVideo(Trick $trick, int $videoIndex): JsonResponse
     {
+        // Gestion d'erreur
         if(!$trick){
             $this->addFlash('danger', 'Trick not found');
             return new JsonResponse(null, 404);
         }
-
+        
         $video = $trick->getVideos()[$videoIndex];
 
+        // Suppression d'une video
         if(!$video){
             $this->addFlash('danger', 'Video not found');
             return new JsonResponse(null, 404);
@@ -262,6 +275,7 @@ class TrickController extends AbstractController
         return new JsonResponse();
     }
 
+    // ImagesHandlerService ?
     private function getLastImageNumber(array|bool $files): int
     {
         $latestImageNumber = 0;
