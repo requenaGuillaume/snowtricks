@@ -17,16 +17,13 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\String\Slugger\AsciiSlugger;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 
 class TrickController extends AbstractController
 {
-// TODO : ajout de plusieurs images a la creation de trick ne marche plus
-// TODO : ajout de plusieurs images a l'edition ne marche plus
-// TODO : l'image 42 n'a pas été supprimé du folder, mais bien suppr en base, fixer ça
+// TODO : l'image 42 n'a pas été supprimé du folder, mais bien suppr en base, investiguer
     public function __construct(
         private EntityManagerInterface $em,
         private ImagesService $imagesService,
@@ -101,6 +98,7 @@ class TrickController extends AbstractController
 
         if(!$edit){
             $trick = new Trick();
+            $trick->setImages([]);
         }       
 
         $form = $this->createForm(TrickFormType::class, $trick);
@@ -114,29 +112,6 @@ class TrickController extends AbstractController
                 $this->addFlash('danger', 'You must choose at least one image for the trick');
                 return $this->redirectToRoute('app_trick_create');
             }
-
-            // On recup la derniere image pour pouvoir savoir comment nommer les suivantes (increment de 1)
-            // $files = scandir($this->dir, SCANDIR_SORT_DESCENDING);
-            // $latestImageNumber = $this->imagesService->getLastImageNumber($files);
-// Add images
-// TODO fix l'ajout de plusieurs images
-            // foreach($formImages as $image){
-            //     // On renome chaque image avec un +1
-            //     ++$latestImageNumber;
-            //     $extension = explode('.', $image->getClientOriginalName())[1];
-            //     $imageName = "$latestImageNumber.$extension";
-
-            //     // On la place dans le dossier souhaité
-            //     /** @var UploadedFile $image */
-            //     $image->move($this->dir, $imageName);
-
-            //     // On ajoute l'image au trick
-            //     if(!$edit){
-            //         $trick->setImages([]);
-            //     }
-
-            //     $trick->addImage($imageName);
-            // }
 
             $this->imagesService->addImages($trick, $formImages, $this->dir, $edit);
 

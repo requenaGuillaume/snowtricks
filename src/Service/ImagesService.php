@@ -3,11 +3,12 @@
 namespace App\Service;
 
 use App\Entity\Trick;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class ImagesService
 {
 
-    // Replace all Trick $trick by all entity type ?
+    // TODO Replace all Trick $trick by all entity type ? + $folder in constructor ?
     public function removeOneImage(Trick $trick, string $image, string $folder): void
     {
         $trick->removeImage($image);
@@ -22,8 +23,7 @@ class ImagesService
         }
     }
 
-    // TODO fix l'ajout de plusieurs images
-    public function addImages(Trick $trick ,array $imagesToAdd, string $folder, bool $edit): void
+    public function addImages(Trick $trick, array $imagesToAdd, string $folder): void
     {
         $files = scandir($folder, SCANDIR_SORT_DESCENDING);
         $latestImageNumber = $this->getLastImageNumber($files);
@@ -35,10 +35,6 @@ class ImagesService
 
             /** @var UploadedFile $image */
             $image->move($folder, $imageName);
-
-            if(!$edit){
-                $trick->setImages([]);
-            }
 
             $trick->addImage($imageName);
         }
