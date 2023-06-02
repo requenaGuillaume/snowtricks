@@ -2,6 +2,24 @@
 
 {% block stylesheets %}
     <style>
+        .height-10{
+            height: 10%;
+        }
+        h1{            
+            text-shadow: 1px 1px 3px black;
+        }
+        .title{
+            height: 80%;
+        }
+        .edit{
+            color: green;
+        }
+        .trash{
+            color: red;
+        }
+        #medias div:not(:last-child){
+            margin-right: 1rem;
+        }
         .pagination{
             justify-content: center;
         }
@@ -59,10 +77,19 @@
         button{
             margin: 0 auto;
         }
+        #see-media{
+            display: none;
+        }
 
-        @media screen and (max-width: 575px){
+        @media screen and (max-width: 768px){
+            #see-media{
+                display: initial;
+            }
             .hide{
                 display: none !important;
+            }
+            form{
+                width: 140%;
             }
         }
     </style>
@@ -71,20 +98,37 @@
 {% block title %}{{ trick.title | capitalize }}{% endblock %}
 
 {% block body %}
-    <div class="bg-image d-flex align-items-center justify-content-center mb-4" 
-        style="background-image: url('https://127.0.0.1:8000/assets/images/tricks/{{mainImage}}')">
-        <h1 class="text-center">{{ trick.title | capitalize }}</h1>
+    <div class="bg-image mb-4 d-flex flex-column flex-wrap" 
+        style="background: url('https://127.0.0.1:8000/assets/images/tricks/{{mainImage}}') center/cover">
+
+        <div class="text-end w-100 height-10">
+        {% if app.user %}
+            <a href="{{ path('app_trick_edit', {'slug': trick.slug}) }}" class="btn edit">
+                <i class="fa-solid fa-pencil"></i>
+            </a>
+            <a href="{{ path('app_trick_delete', {'slug': trick.slug}) }}" class="btn trash">
+                <i class="fa-solid fa-trash-can"></i>
+            </a>
+        {% endif %}
+        </div>
+
+        <div class="d-flex align-items-center w-100 title">
+            <h1 class="w-100 text-center">{{ trick.title | capitalize }}</h1>
+        </div>
     </div>
 
-    <button id="mobile" class="d-sm-none d-block w-50 btn btn-primary">See medias</button>
+    <div class="text-center">
+        <button id="see-media" class="btn btn-primary text w-25 mb-4">See media</button>
+    </div>
 
-    <div id="medias" class="d-flex justify-content-between hide">
+    <div id="medias" class="d-flex hide">
         {% set imageNumber = 1 %}
         {% for image in otherImages %}
             <div class="mb-4" style="width: 20%; height: 100px;">
                 <img src="https://127.0.0.1:8000/assets/images/tricks/{{image}}" 
                     alt="{{trick.title}} {{imageNumber}}"
                     class="w-100"
+                    style="height: 100%";
                 >
             </div>
             {% set imageNumber = imageNumber + 1 %}
@@ -92,7 +136,7 @@
 
         {% set videoNumber = 1 %}
         {% for video in trick.videos %}
-            <div class="mb-4" style="width: 20%; height: 100px;">
+            <div class="mb-4 overflow-hidden" style="width: 20%; height: 100px;">
                 <iframe width="100%"
                     height="125%"
                     src={{video}}
@@ -158,12 +202,12 @@
 
 {% block javascripts %}
     <script>
-        const mediaButton = document.getElementById('mobile');
-        const medias = document.getElementById('medias');
+        const mediaButton = document.getElementById('see-media');
 
         mediaButton.addEventListener('click', () => {
             medias.classList.remove('hide');
-            mediaButton.classList.add('hide');
+            mediaButton.style.display = 'none';
         });
+
     </script>
 {% endblock %}

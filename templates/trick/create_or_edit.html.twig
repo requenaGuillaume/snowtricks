@@ -1,5 +1,30 @@
 {% extends 'base.html.twig' %}
 
+{% block stylesheets %}
+    <style>
+        button{
+            font-size: 0.8rem !important;
+        }
+
+        #see-media{
+            display: none;
+        }
+        .hide{
+            display: none !important;
+        }
+
+        @media screen and (max-width: 768px){
+            .mobile-hide{
+                display: none !important;
+            }
+
+            #see-media{
+                display: initial;
+            }
+        }
+    </style>
+{% endblock %}
+
 {% block title %}
     {% if edit %}
         Edit
@@ -43,27 +68,33 @@
     {{ form_end(form) }}
 
     {% if edit %}
-        <div class="d-flex js-data-images" data-slug={{trick.slug}}>
+        <div class="text-center">
+            <button id="see-media" class="btn btn-primary text w-50">See media</button>
+        </div>
+
+        <div class="d-flex js-data-images mobile-hide" data-slug={{trick.slug}}>
             {% set index = 0 %}
             {% for image in trick.images %}
                 <div id="{{image}}" class="p-2" style="width: 20%; height: 12rem; overflow: hidden;">
                     <img src="https://127.0.0.1:8000/assets/images/tricks/{{image}}"
-                        alt=""
-                        style="width: 100%;"
-                        class="js-images"
+                        alt="{{ trick.title }} {{index}}"
+                        style="height: 70%;"
+                        class="js-images w-100"
                         data-image={{image}}
                     >
-                    {% if index > 0 %}
-                        <btn id="main-{{image}}" class="btn btn-primary mt-2">Set as main image</btn>
-                    {% endif %}
-                    <btn id="delete-{{image}}" class="btn btn-danger mt-2 float-end">
-                        <i class="fa-solid fa-trash"></i>
-                    </btn>
+                    <div class="d-flex justify-content-between">
+                        {% if index > 0 %}
+                        <button id="main-{{image}}" class="btn btn-primary mt-2 w-75">Main image</button>
+                        <button id="delete-{{image}}" class="btn btn-danger mt-2 float-end">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                        {% endif %}
+                    </div>
                 </div>
                 {% set index = index + 1 %}
             {% endfor %}
         </div>
-        <div class="d-flex">
+        <div class="d-flex mobile-hide">
             {% set index = 0 %}
             {% for video in trick.videos %}
                 <div id="video-{{index}}" class="p-2" style="width: 20%; height: 16rem; overflow: hidden;">
@@ -75,9 +106,9 @@
                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
                         allowfullscreen>
                     </iframe>
-                    <btn class="js-videos btn btn-danger mt-2 float-end">
+                    <button class="js-videos btn btn-danger mt-2 float-end">
                         <i class="fa-solid fa-trash"></i>
-                    </btn>
+                    </button>
                 </div>
                 {% set index = index + 1 %}
             {% endfor %}
@@ -99,20 +130,21 @@
                     let deleteButton = document.getElementById(`delete-${image}`);
                     let mainImageButton = document.getElementById(`main-${image}`);
 
-                    deleteButton.addEventListener('click', function(){
-                        let confirm = window.confirm('Confirm you want to delete this image.');
-
-                        if(confirm){
-                            console.log(slug, image);
-                            let request = new Request(`https://127.0.0.1:8000/trick/edit/${slug}/remove-image/${image}`, init);
+                    if(deleteButton){
+                        deleteButton.addEventListener('click', function(){
+                            let confirm = window.confirm('Confirm you want to delete this image.');
     
-                            fetch(request).then(function(response){
-                                if(response.ok && response.status === 200){
-                                    document.getElementById(image).style.display = 'none';
-                                }
-                            });
-                        }
-                    });
+                            if(confirm){
+                                let request = new Request(`https://127.0.0.1:8000/trick/edit/${slug}/remove-image/${image}`, init);
+        
+                                fetch(request).then(function(response){
+                                    if(response.ok && response.status === 200){
+                                        document.getElementById(image).style.display = 'none';
+                                    }
+                                });
+                            }
+                        });
+                    }
 
                     if(mainImageButton){
                         mainImageButton.addEventListener('click', function(){
@@ -147,6 +179,18 @@
                         }
                     });
                 }
+
+                const seeMedia = document.getElementById('see-media');
+
+                seeMedia.addEventListener('click', function(){
+                    let hiddenMedia = document.getElementsByClassName('mobile-hide');
+
+                    for(media of hiddenMedia){
+                        media.classList.remove('mobile-hide');
+                    }
+
+                    seeMedia.classList.add('hide');
+                });
 
             });
         </script>

@@ -2,7 +2,15 @@
 
 {% block stylesheets %}
     <style>
+        .hide{
+            display: none;
+        }
+
         @media screen and (max-width: 768px){
+            .hide{
+                display: inherit;
+            }
+
            form{
                 width: 70% !important;
                 margin: 0 auto;
@@ -33,11 +41,15 @@
 
         <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
 
+        <p class="text-center mt-2 hide">
+            <a href="{{ path('app_register') }}">Register</a>
+        </p>
+
         <p class="text-center mt-2">
             <a href="{{ path('app_forgot_password_request') }}">Forgot your password ?</a>
         </p>
 
-        <button type="submit" class="btn btn-primary" style="margin-left: 50%; transform: translateX(-50%);">
+        <button type="submit" class="btn btn-primary w-50" style="margin-left: 50%; transform: translateX(-50%);">
             Login
         </button>
     </form>
