@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Interface\ImagesInterface;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\TrickRepository;
@@ -11,7 +12,7 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 #[ORM\Entity(repositoryClass: TrickRepository::class)]
 #[UniqueEntity('title')]
-class Trick
+class Trick implements ImagesInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]

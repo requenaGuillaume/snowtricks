@@ -2,28 +2,28 @@
 
 namespace App\Service;
 
-use App\Entity\Trick;
+use App\Interface\ImagesInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class ImagesService
 {
 
-    // TODO Replace all Trick $trick by all entity type ? + $folder in constructor ?
-    public function removeOneImage(Trick $trick, string $image, string $folder): void
+    // TODO  $folder in constructor ?
+    public function removeOneImage(ImagesInterface $entity, string $image, string $folder): void
     {
-        $trick->removeImage($image);
+        $entity->removeImage($image);
 
         unlink("$folder/$image");
     }
 
-    public function removeAllImages(Trick $trick, string $folder)
+    public function removeAllImages(ImagesInterface $entity, string $folder)
     {
-        foreach($trick->getImages() as $image){
+        foreach($entity->getImages() as $image){
             unlink("$folder/$image");
         }
     }
 
-    public function addImages(Trick $trick, array $imagesToAdd, string $folder): void
+    public function addImages(ImagesInterface $entity, array $imagesToAdd, string $folder): void
     {
         $files = scandir($folder, SCANDIR_SORT_DESCENDING);
         $latestImageNumber = $this->getLastImageNumber($files);
@@ -36,7 +36,7 @@ class ImagesService
             /** @var UploadedFile $image */
             $image->move($folder, $imageName);
 
-            $trick->addImage($imageName);
+            $entity->addImage($imageName);
         }
     }
 
