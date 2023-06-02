@@ -225,15 +225,15 @@ class TrickController extends AbstractController
             return new JsonResponse(null, 404);
         }
         
-        $video = $trick->getVideos()[$videoIndex];
+        $videos = $trick->getVideos();
 
         // Suppression d'une video
-        if(!$video){
+        if(!$videos || $videos[$videoIndex]){
             $this->addFlash('danger', 'Video not found');
             return new JsonResponse(null, 404);
         }
 
-        $trick->removeVideo($video);
+        $trick->removeVideo($videos[$videoIndex]);
         $this->em->flush();
 
         return new JsonResponse();
