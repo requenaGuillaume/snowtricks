@@ -174,6 +174,22 @@ class Trick
         return reset($images);
     }
 
+    public function getSecondariesImages(): array
+    {
+        $allImages = $this->getImages();
+        $mainImage = $this->getMainImage();
+        $otherImages = [];
+
+        for($i = 1; $i <= count($allImages); ++$i){
+            $otherImages = $allImages; // TODO - A mettre en dehors de la boucle ?
+            if (($key = array_search($mainImage, $otherImages)) !== false) {
+                unset($otherImages[$key]);
+            }
+        }
+
+        return $otherImages;
+    }
+
     public function getVideos(): array
     {
         return $this->videos;

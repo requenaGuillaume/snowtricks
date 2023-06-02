@@ -9,6 +9,7 @@ use App\Entity\Comment;
 use App\Form\TrickFormType;
 use App\Form\CommentFormType;
 use App\Repository\CommentRepository;
+use App\Service\ImagesService;
 use Doctrine\ORM\EntityManagerInterface;
 use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -23,9 +24,12 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 
 class TrickController extends AbstractController
 {
-
+// TODO : ajout de plusieurs images a la creation de trick ne marche plus
+// TODO : ajout de plusieurs images a l'edition ne marche plus
+// TODO : l'image 42 n'a pas été supprimé du folder, mais bien suppr en base, fixer ça
     public function __construct(
         private EntityManagerInterface $em,
+        private ImagesService $imagesService,
 
         #[Autowire('%kernel.project_dir%/public/assets/images/tricks')]
         private $dir
@@ -43,18 +47,6 @@ class TrickController extends AbstractController
         if(!$trick){
             $this->addFlash('danger', 'Trick page not found.');
             return $this->redirectToRoute('app_home');
-        }
-
-        $allImages = $trick->getImages();
-        $mainImage = $trick->getMainImage();
-        $otherImages = [];
-
-        // Pour l'affichage, on separe la main image des autres images
-        for($i = 1; $i <= count($allImages); ++$i){
-            $otherImages = $allImages; // A mettre en dehors de la boucle ?
-            if (($key = array_search($mainImage, $otherImages)) !== false) {
-                unset($otherImages[$key]);
-            }
         }
 
         $form = $this->createForm(CommentFormType::class);
@@ -84,8 +76,8 @@ class TrickController extends AbstractController
 
         return $this->render('trick/index.html.twig', [
             'trick' => $trick,
-            'mainImage' => $mainImage,
-            'otherImages' => $otherImages,
+            'mainImage' => $trick->getMainImage(),
+            'otherImages' => $trick->getSecondariesImages(),
             'commentForm' => $form->createView(),
             'pagination' => $pagination
         ]);
@@ -124,26 +116,29 @@ class TrickController extends AbstractController
             }
 
             // On recup la derniere image pour pouvoir savoir comment nommer les suivantes (increment de 1)
-            $files = scandir($this->dir, SCANDIR_SORT_DESCENDING);
-            $latestImageNumber = $this->getLastImageNumber($files);
+            // $files = scandir($this->dir, SCANDIR_SORT_DESCENDING);
+            // $latestImageNumber = $this->imagesService->getLastImageNumber($files);
+// Add images
+// TODO fix l'ajout de plusieurs images
+            // foreach($formImages as $image){
+            //     // On renome chaque image avec un +1
+            //     ++$latestImageNumber;
+            //     $extension = explode('.', $image->getClientOriginalName())[1];
+            //     $imageName = "$latestImageNumber.$extension";
 
-            foreach($formImages as $image){
-                // On renome chaque image avec un +1
-                ++$latestImageNumber;
-                $extension = explode('.', $image->getClientOriginalName())[1];
-                $imageName = "$latestImageNumber.$extension";
+            //     // On la place dans le dossier souhaité
+            //     /** @var UploadedFile $image */
+            //     $image->move($this->dir, $imageName);
 
-                // On la place dans le dossier souhaité
-                /** @var UploadedFile $image */
-                $image->move($this->dir, $imageName);
+            //     // On ajoute l'image au trick
+            //     if(!$edit){
+            //         $trick->setImages([]);
+            //     }
 
-                // On ajoute l'image au trick
-                if(!$edit){
-                    $trick->setImages([]);
-                }
+            //     $trick->addImage($imageName);
+            // }
 
-                $trick->addImage($imageName);
-            }
+            $this->imagesService->addImages($trick, $formImages, $this->dir, $edit);
 
             // video - remplace dans l'url
             $formVideo = $form['video']->getData();
@@ -184,10 +179,7 @@ class TrickController extends AbstractController
     )]
     public function delete(Trick $trick): Response
     {
-        // On supprime toutes les images d'une trick
-        foreach($trick->getImages() as $image){
-            unlink("{$this->dir}/$image");
-        }
+        $this->imagesService->removeAllImages($trick, $this->dir);
 
         $this->em->remove($trick);
         $this->em->flush();
@@ -219,11 +211,8 @@ class TrickController extends AbstractController
             return new JsonResponse(null, 404);
         }
 
-        // On supprime une image
-        $trick->removeImage($image);
+        $this->imagesService->removeOneImage($trick, $image, $this->dir);
         $this->em->flush();
-
-        unlink("{$this->dir}/$image");
 
         return new JsonResponse();
     }
@@ -273,22 +262,6 @@ class TrickController extends AbstractController
         $this->em->flush();
 
         return new JsonResponse();
-    }
-
-    // ImagesHandlerService ?
-    private function getLastImageNumber(array|bool $files): int
-    {
-        $latestImageNumber = 0;
-
-        foreach($files as $file){
-            $imageNumber = explode('.', $file)[0];
-
-            if($imageNumber > $latestImageNumber){
-                $latestImageNumber = $imageNumber;
-            }
-        }
-
-        return $latestImageNumber;
     }
 
 }
