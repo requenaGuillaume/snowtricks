@@ -184,13 +184,10 @@ class Trick implements ImageEntityInterface
     {
         $allImages = $this->getImages();
         $mainImage = $this->getMainImage();
-        $otherImages = [];
+        $otherImages = $allImages;
 
-        for($i = 1; $i <= count($allImages); ++$i){
-            $otherImages = $allImages; // TODO - A mettre en dehors de la boucle ?
-            if (($key = array_search($mainImage, $otherImages)) !== false) {
-                unset($otherImages[$key]);
-            }
+        if (($key = array_search($mainImage, $otherImages)) !== false) {
+            unset($otherImages[$key]);
         }
 
         return $otherImages;
