@@ -6,6 +6,7 @@ use DateTime;
 use App\Entity\Trick;
 use DateTimeImmutable;
 use App\Entity\Comment;
+use App\Factory\CommentFactory;
 use App\Form\TrickFormType;
 use App\Form\CommentFormType;
 use App\Repository\CommentRepository;
@@ -30,7 +31,8 @@ class TrickController extends AbstractController
     public function show(
         ?Trick $trick, 
         Request $request, 
-        CommentRepository $commentRepository, 
+        CommentRepository $commentRepository,
+        CommentFactory $commentFactory,
         PaginatorInterface $paginator
     ): Response
     {
@@ -42,15 +44,8 @@ class TrickController extends AbstractController
         $form = $this->createForm(CommentFormType::class);
         $form->handleRequest($request);
 
-        // Creation de commentaires
         if ($form->isSubmitted() && $form->isValid()) {
-            $content = $form->get('content')->getData();
-
-            $comment = new Comment();
-            $comment->setAuthor($this->getUser())
-                ->setTrick($trick)
-                ->setCreatedAt(DateTimeImmutable::createFromMutable(new DateTime()))
-                ->setContent($content);
+            $comment = $commentFactory->createOne($trick, $form->get('content')->getData());
 
             $this->em->persist($comment);
             $this->em->flush();
