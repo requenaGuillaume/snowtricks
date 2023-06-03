@@ -2,7 +2,7 @@
 
 namespace App\Interface;
 
-interface ImagesInterface
+interface ImageEntityInterface
 {
     public function getImages(): array;
 

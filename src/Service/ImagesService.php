@@ -2,30 +2,34 @@
 
 namespace App\Service;
 
-use App\Interface\ImagesInterface;
+use App\Interface\ImageEntityInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class ImagesService
 {
 
-    // TODO  $folder in constructor ?
-    public function removeOneImage(ImagesInterface $entity, string $image, string $folder): void
+    public function __construct(private string $folder)
+    {
+        
+    }
+
+    public function removeOneImage(ImageEntityInterface $entity, string $image): void
     {
         $entity->removeImage($image);
 
-        unlink("$folder/$image");
+        unlink("{$this->folder}/$image");
     }
 
-    public function removeAllImages(ImagesInterface $entity, string $folder)
+    public function removeAllImages(ImageEntityInterface $entity)
     {
         foreach($entity->getImages() as $image){
-            unlink("$folder/$image");
+            unlink("{$this->folder}/$image");
         }
     }
 
-    public function addImages(ImagesInterface $entity, array $imagesToAdd, string $folder): void
+    public function addImages(ImageEntityInterface $entity, array $imagesToAdd): void
     {
-        $files = scandir($folder, SCANDIR_SORT_DESCENDING);
+        $files = scandir($this->folder, SCANDIR_SORT_DESCENDING);
         $latestImageNumber = $this->getLastImageNumber($files);
 
         foreach($imagesToAdd as $image){
@@ -34,7 +38,7 @@ class ImagesService
             $imageName = "$latestImageNumber.$extension";
 
             /** @var UploadedFile $image */
-            $image->move($folder, $imageName);
+            $image->move($this->folder, $imageName);
 
             $entity->addImage($imageName);
         }

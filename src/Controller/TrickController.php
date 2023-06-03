@@ -17,20 +17,13 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\String\Slugger\AsciiSlugger;
-use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 
 class TrickController extends AbstractController
 {
-// TODO : l'image 42 n'a pas été supprimé du folder, mais bien suppr en base, investiguer
-    public function __construct(
-        private EntityManagerInterface $em,
-        private ImagesService $imagesService,
 
-        #[Autowire('%kernel.project_dir%/public/assets/images/tricks')]
-        private $dir
-    )
+    public function __construct(private EntityManagerInterface $em, private ImagesService $imagesService)
     {}
 
     #[Route('/trick/show/{slug}', name: 'app_trick', requirements: ['slug' => '[a-z0-9][a-z0-9-]{0,}[a-z0-9]'])]
@@ -113,7 +106,7 @@ class TrickController extends AbstractController
                 return $this->redirectToRoute('app_trick_create');
             }
 
-            $this->imagesService->addImages($trick, $formImages, $this->dir, $edit);
+            $this->imagesService->addImages($trick, $formImages);
 
             // video - remplace dans l'url
             $formVideo = $form['video']->getData();
@@ -154,7 +147,7 @@ class TrickController extends AbstractController
     )]
     public function delete(Trick $trick): Response
     {
-        $this->imagesService->removeAllImages($trick, $this->dir);
+        $this->imagesService->removeAllImages($trick);
 
         $this->em->remove($trick);
         $this->em->flush();
@@ -186,7 +179,7 @@ class TrickController extends AbstractController
             return new JsonResponse(null, 404);
         }
 
-        $this->imagesService->removeOneImage($trick, $image, $this->dir);
+        $this->imagesService->removeOneImage($trick, $image);
         $this->em->flush();
 
         return new JsonResponse();
