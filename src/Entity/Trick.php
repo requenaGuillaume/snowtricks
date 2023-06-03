@@ -9,6 +9,7 @@ use App\Repository\TrickRepository;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: TrickRepository::class)]
 #[UniqueEntity('title')]
@@ -20,9 +21,11 @@ class Trick implements ImageEntityInterface
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message: ('Title cannot be empty'))]
     private ?string $title = null;
 
     #[ORM\Column(type: Types::TEXT)]
+    #[Assert\NotBlank(message: ('Description cannot be empty'))]
     private ?string $description = null;
 
     #[ORM\Column(length: 255)]
@@ -32,6 +35,7 @@ class Trick implements ImageEntityInterface
     private Collection $comments;
 
     #[ORM\Column]
+    #[Assert\NotBlank(message: ('Images cannot be empty'))]
     private array $images = [];
 
     #[ORM\Column]
@@ -43,6 +47,7 @@ class Trick implements ImageEntityInterface
 
     #[ORM\ManyToOne(inversedBy: 'tricks')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Assert\NotBlank(message: ('Group cannot be empty'))]
     private ?Group $category = null;
 
     #[ORM\Column]
