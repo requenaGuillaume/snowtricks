@@ -3,9 +3,10 @@
 namespace App\Service;
 
 use App\Interface\ImageEntityInterface;
+use App\Interface\ImageServiceInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
-class ImagesService
+class ImagesService implements ImageServiceInterface
 {
 
     public function __construct(private string $folder)
@@ -20,7 +21,7 @@ class ImagesService
         unlink("{$this->folder}/$image");
     }
 
-    public function removeAllImages(ImageEntityInterface $entity)
+    public function removeAllImages(ImageEntityInterface $entity): void
     {
         foreach($entity->getImages() as $image){
             unlink("{$this->folder}/$image");
