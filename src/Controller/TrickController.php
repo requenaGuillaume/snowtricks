@@ -79,26 +79,21 @@ class TrickController extends AbstractController
     ]
     public function createOrEdit(Request $request, TrickFactory $trickFactory, ?Trick $trick = null): Response
     {
-        $edit = false;
-
-        if($request->attributes->get('_route') === 'app_trick_edit'){
-            if(!$trick){
-                $this->addFlash('danger', 'Trick not found');
-                return $this->redirectToRoute('app_home');
-            }
-
-            $edit = true;
-        }
+        $edit = $this->isEditMode($request);
 
         if(!$edit){
             $trick = $trickFactory->createOneEmpty();
-        }       
+        }
+
+        if($edit && !$trick){
+            $this->addFlash('danger', 'Trick not found');
+            return $this->redirectToRoute('app_home');
+        }
 
         $form = $this->createForm(TrickFormType::class, $trick);
         $form->handleRequest($request);
 
         if($form->isSubmitted() && $form->isValid()){
-
             $formImages = $form['images']->getData();
 
             if(!$edit && !$formImages){
@@ -108,7 +103,6 @@ class TrickController extends AbstractController
 
             $this->imagesService->addImages($trick, $formImages);
 
-            // video - remplace dans l'url
             $formVideo = $form['video']->getData();
 
             if($formVideo){
@@ -120,7 +114,7 @@ class TrickController extends AbstractController
                 $slug = $slugger->slug(strtolower($form['title']->getData())); 
                 $trickFactory->fillMissingFields($trick, $slug);                
                 $this->em->persist($trick);
-                
+
                 $this->addFlash('success', 'Trick has been successfully created');
             }else{
                 $this->addFlash('success', 'Trick has been successfully updated');
@@ -230,6 +224,18 @@ class TrickController extends AbstractController
         $this->em->flush();
 
         return new JsonResponse();
+    }
+
+
+    private function isEditMode(Request $request): bool
+    {
+        $edit = false;
+
+        if($request->attributes->get('_route') === 'app_trick_edit'){
+            $edit = true;
+        }
+
+        return $edit;
     }
 
 }
