@@ -2,15 +2,12 @@
 
 namespace App\Controller;
 
-use DateTime;
 use App\Entity\Trick;
-use DateTimeImmutable;
-use App\Entity\Comment;
-use App\Factory\CommentFactory;
 use App\Form\TrickFormType;
 use App\Form\CommentFormType;
-use App\Repository\CommentRepository;
 use App\Service\ImagesService;
+use App\Factory\CommentFactory;
+use App\Repository\CommentRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -18,8 +15,9 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\String\Slugger\AsciiSlugger;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class TrickController extends AbstractController
 {
@@ -27,13 +25,17 @@ class TrickController extends AbstractController
     public function __construct(private EntityManagerInterface $em, private ImagesService $imagesService)
     {}
 
-    #[Route('/trick/show/{slug}', name: 'app_trick', requirements: ['slug' => '[a-z0-9][a-z0-9-]{0,}[a-z0-9]'])]
-    public function show(
-        ?Trick $trick, 
-        Request $request, 
+    #[Route('/trick/show/{slug}',
+        name: 'app_trick', 
+        requirements: ['slug' => '[a-z0-9][a-z0-9-]{0,}[a-z0-9]'],
+        methods: ['GET', 'POST'])
+    ]
+    public function show(        
+        Request $request,
         CommentRepository $commentRepository,
         CommentFactory $commentFactory,
-        PaginatorInterface $paginator
+        PaginatorInterface $paginator,
+        ?Trick $trick, 
     ): Response
     {
         if(!$trick){
@@ -69,9 +71,13 @@ class TrickController extends AbstractController
     }
 
     #[IsGranted('ROLE_USER')]
-    #[Route('/trick/create', name: 'app_trick_create')]
-    #[Route('/trick/edit/{slug}', name: 'app_trick_edit', requirements: ['slug' => '[a-z0-9][a-z0-9-]{0,}[a-z0-9]'])]
-    public function createOrEdit(?Trick $trick = null, Request $request): Response
+    #[Route('/trick/create', name: 'app_trick_create', methods: ['GET', 'POST'])]
+    #[Route('/trick/edit/{slug}', 
+        name: 'app_trick_edit', 
+        requirements: ['slug' => '[a-z0-9][a-z0-9-]{0,}[a-z0-9]'],
+        methods: ['GET', 'POST'])
+    ]
+    public function createOrEdit(Request $request, ?Trick $trick = null): Response
     {
         $edit = false;
 
@@ -107,7 +113,7 @@ class TrickController extends AbstractController
             $formVideo = $form['video']->getData();
 
             if($formVideo){
-                $trick->addVideo(str_replace('watch?v=', 'embed/',$formVideo ));
+                $trick->addVideo(str_replace('watch?v=', 'embed/', $formVideo));
             }
 
             if(!$edit){
@@ -116,7 +122,7 @@ class TrickController extends AbstractController
                 $slugger = new AsciiSlugger();
                 $slug = $slugger->slug(strtolower($title)); 
                 $trick->setSlug($slug)
-                    ->setCreatedAt(new DateTimeImmutable())
+                    ->setCreatedAt(new \DateTimeImmutable())
                     ->setAuthor($this->getUser());
                 $this->em->persist($trick);
                 $this->addFlash('success', 'Trick has been successfully created');
@@ -138,10 +144,12 @@ class TrickController extends AbstractController
     #[IsGranted('ROLE_USER')]
     #[Route('/trick/delete/{slug}',
         name: 'app_trick_delete',
-        requirements: ['slug' => '[a-z0-9][a-z0-9-]{0,}[a-z0-9]']
-    )]
-    public function delete(Trick $trick): Response
+        requirements: ['slug' => '[a-z0-9][a-z0-9-]{0,}[a-z0-9]'],
+        methods: ['GET'])
+    ]
+    public function delete(Trick $trick): RedirectResponse
     {
+        // TODO ajout gestion d'erreur $trick not found
         $this->imagesService->removeAllImages($trick);
 
         $this->em->remove($trick);
@@ -154,7 +162,8 @@ class TrickController extends AbstractController
     #[IsGranted('ROLE_USER')]
     #[Route('/trick/edit/{slug}/remove-image/{image}', 
         name: 'app_trick_remove_image', 
-        requirements: ['slug' => '[a-z0-9][a-z0-9-]{0,}[a-z0-9]', 'image' => '\d+\.{1}(jpg|jpeg|png)']
+        requirements: ['slug' => '[a-z0-9][a-z0-9-]{0,}[a-z0-9]', 'image' => '\d+\.{1}(jpg|jpeg|png)'],
+        methods: ['GET']
     )]
     public function removeImage(Trick $trick, string $image): JsonResponse
     {
@@ -183,7 +192,8 @@ class TrickController extends AbstractController
     #[IsGranted('ROLE_USER')]
     #[Route('/trick/edit/{slug}/main-image/{image}', 
         name: 'app_trick_main_image', 
-        requirements: ['slug' => '[a-z0-9][a-z0-9-]{0,}[a-z0-9]', 'image' => '\d+\.{1}(jpg|jpeg|png)']
+        requirements: ['slug' => '[a-z0-9][a-z0-9-]{0,}[a-z0-9]', 'image' => '\d+\.{1}(jpg|jpeg|png)'],
+        methods: ['GET']
     )]
     public function setMainImage(Trick $trick, string $image): JsonResponse
     {
@@ -203,7 +213,8 @@ class TrickController extends AbstractController
     #[IsGranted('ROLE_USER')]
     #[Route('/trick/edit/{slug}/remove-video/{videoIndex}', 
         name: 'app_trick_remove_video',
-        requirements: ['slug' => '[a-z0-9][a-z0-9-]{0,}[a-z0-9]', 'videoIndex' => '\d+']
+        requirements: ['slug' => '[a-z0-9][a-z0-9-]{0,}[a-z0-9]', 'videoIndex' => '\d+'],
+        methods: ['GET']
     )]
     public function removeVideo(Trick $trick, int $videoIndex): JsonResponse
     {
@@ -215,8 +226,8 @@ class TrickController extends AbstractController
         
         $videos = $trick->getVideos();
 
-        // Suppression d'une video
-        if(!$videos || $videos[$videoIndex]){
+        // Gestion d'erreur - Suppression d'une video
+        if(!$videos || !$videos[$videoIndex]){
             $this->addFlash('danger', 'Video not found');
             return new JsonResponse(null, 404);
         }
