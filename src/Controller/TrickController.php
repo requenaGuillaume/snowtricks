@@ -102,7 +102,6 @@ class TrickController extends AbstractController
             }
 
             $this->imagesService->addImages($trick, $formImages);
-
             $formVideo = $form['video']->getData();
 
             if($formVideo){
@@ -137,9 +136,13 @@ class TrickController extends AbstractController
         requirements: ['slug' => '[a-z0-9][a-z0-9-]{0,}[a-z0-9]'],
         methods: ['GET'])
     ]
-    public function delete(Trick $trick): RedirectResponse
+    public function delete(?Trick $trick): RedirectResponse
     {
-        // TODO ajout gestion d'erreur $trick not found
+        if(!$trick){
+            $this->addFlash('danger', 'Trick not found');
+            return $this->redirectToRoute('app_home');
+        }
+
         $this->imagesService->removeAllImages($trick);
         $this->em->remove($trick);
         $this->em->flush();
@@ -154,22 +157,21 @@ class TrickController extends AbstractController
         requirements: ['slug' => '[a-z0-9][a-z0-9-]{0,}[a-z0-9]', 'image' => '\d+\.{1}(jpg|jpeg|png)'],
         methods: ['GET']
     )]
-    public function removeImage(Trick $trick, string $image): JsonResponse
+    public function removeImage(?Trick $trick, string $image): JsonResponse|RedirectResponse
     {
-        // Gestion d'erreur
         if(!$trick){
             $this->addFlash('danger', 'Trick not found');
-            return new JsonResponse(null, 404);
+            return $this->redirectToRoute('app_home');
         }
 
         if($trick->getMainImage() === $image){
             $this->addFlash('danger', 'You cannot delete the main image');
-            return new JsonResponse(null, 403);
+            return $this->redirectToRoute('app_home');
         }
 
         if(!in_array($image, $trick->getImages())){
             $this->addFlash('danger', 'This trick does not have this image');
-            return new JsonResponse(null, 404);
+            return $this->redirectToRoute('app_home');
         }
 
         $this->imagesService->removeOneImage($trick, $image);
@@ -184,12 +186,16 @@ class TrickController extends AbstractController
         requirements: ['slug' => '[a-z0-9][a-z0-9-]{0,}[a-z0-9]', 'image' => '\d+\.{1}(jpg|jpeg|png)'],
         methods: ['GET']
     )]
-    public function setMainImage(Trick $trick, string $image): JsonResponse
+    public function setMainImage(?Trick $trick, string $image): JsonResponse|RedirectResponse
     {
-        //  Gestion d'erreur
         if(!$trick){
             $this->addFlash('danger', 'Trick not found');
-            return new JsonResponse(null, 404);
+            return $this->redirectToRoute('app_home');
+        }
+
+        if(!in_array($image, $trick->getImages())){
+            $this->addFlash('danger', 'This trick does not have this image');
+            return $this->redirectToRoute('app_home');
         }
 
         $trick->setMainImage($image);
@@ -204,20 +210,18 @@ class TrickController extends AbstractController
         requirements: ['slug' => '[a-z0-9][a-z0-9-]{0,}[a-z0-9]', 'videoIndex' => '\d+'],
         methods: ['GET']
     )]
-    public function removeVideo(Trick $trick, int $videoIndex): JsonResponse
+    public function removeVideo(Trick $trick, int $videoIndex): JsonResponse|RedirectResponse
     {
-        // Gestion d'erreur
         if(!$trick){
             $this->addFlash('danger', 'Trick not found');
-            return new JsonResponse(null, 404);
+            return $this->redirectToRoute('app_home');
         }
         
         $videos = $trick->getVideos();
 
-        // Gestion d'erreur - Suppression d'une video
         if(!$videos || !$videos[$videoIndex]){
             $this->addFlash('danger', 'Video not found');
-            return new JsonResponse(null, 404);
+            return $this->redirectToRoute('app_home');
         }
 
         $trick->removeVideo($videos[$videoIndex]);
