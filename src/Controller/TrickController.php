@@ -7,6 +7,7 @@ use App\Form\TrickFormType;
 use App\Form\CommentFormType;
 use App\Service\ImagesService;
 use App\Factory\CommentFactory;
+use App\Factory\TrickFactory;
 use App\Repository\CommentRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Knp\Component\Pager\PaginatorInterface;
@@ -48,7 +49,6 @@ class TrickController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $comment = $commentFactory->createOne($trick, $form->get('content')->getData());
-
             $this->em->persist($comment);
             $this->em->flush();
 
@@ -77,7 +77,7 @@ class TrickController extends AbstractController
         requirements: ['slug' => '[a-z0-9][a-z0-9-]{0,}[a-z0-9]'],
         methods: ['GET', 'POST'])
     ]
-    public function createOrEdit(Request $request, ?Trick $trick = null): Response
+    public function createOrEdit(Request $request, TrickFactory $trickFactory, ?Trick $trick = null): Response
     {
         $edit = false;
 
@@ -91,8 +91,7 @@ class TrickController extends AbstractController
         }
 
         if(!$edit){
-            $trick = new Trick();
-            $trick->setImages([]);
+            $trick = $trickFactory->createOneEmpty();
         }       
 
         $form = $this->createForm(TrickFormType::class, $trick);
@@ -117,14 +116,11 @@ class TrickController extends AbstractController
             }
 
             if(!$edit){
-                // On rempli la new Trick()
-                $title = $form['title']->getData();
                 $slugger = new AsciiSlugger();
-                $slug = $slugger->slug(strtolower($title)); 
-                $trick->setSlug($slug)
-                    ->setCreatedAt(new \DateTimeImmutable())
-                    ->setAuthor($this->getUser());
+                $slug = $slugger->slug(strtolower($form['title']->getData())); 
+                $trickFactory->fillMissingFields($trick, $slug);                
                 $this->em->persist($trick);
+                
                 $this->addFlash('success', 'Trick has been successfully created');
             }else{
                 $this->addFlash('success', 'Trick has been successfully updated');
@@ -151,7 +147,6 @@ class TrickController extends AbstractController
     {
         // TODO ajout gestion d'erreur $trick not found
         $this->imagesService->removeAllImages($trick);
-
         $this->em->remove($trick);
         $this->em->flush();
 
@@ -204,7 +199,6 @@ class TrickController extends AbstractController
         }
 
         $trick->setMainImage($image);
-
         $this->em->flush();
 
         return new JsonResponse();
