@@ -33,7 +33,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private ?string $password = null;
 
-    // Il prend pas l'assert email..
+    // TODO Il prend pas l'assert email..
     #[ORM\Column(length: 255)]
     #[Assert\Email(message: 'You must enter a valid email')]
     private ?string $email = null;
@@ -89,7 +89,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function getRoles(): array
     {
         $roles = $this->roles;
-        // guarantee every user at least has ROLE_USER
         $roles[] = 'ROLE_USER';
 
         return array_unique($roles);
@@ -122,8 +121,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     public function eraseCredentials()
     {
-        // If you store any temporary, sensitive data on the user, clear it here
-        // $this->plainPassword = null;
     }
 
     public function getEmail(): ?string
@@ -183,7 +180,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function removeTrick(Trick $trick): self
     {
         if ($this->tricks->removeElement($trick)) {
-            // set the owning side to null (unless already changed)
             if ($trick->getUser() === $this) {
                 $trick->setUser(null);
             }
@@ -213,7 +209,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function removeComment(Comment $comment): self
     {
         if ($this->comments->removeElement($comment)) {
-            // set the owning side to null (unless already changed)
             if ($comment->getUser() === $this) {
                 $comment->setUser(null);
             }
