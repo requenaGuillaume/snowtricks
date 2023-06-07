@@ -2,8 +2,8 @@
 
 namespace App\Service;
 
-use App\Interface\ImageEntityInterface;
-use App\Interface\ImageServiceInterface;
+use App\InterfaceClass\ImageEntityInterface;
+use App\InterfaceClass\ImageServiceInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class ImagesService implements ImageServiceInterface

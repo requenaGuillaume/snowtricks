@@ -2,7 +2,7 @@
 
 namespace App\Entity;
 
-use App\Interface\ImageEntityInterface;
+use App\InterfaceClass\ImageEntityInterface;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\TrickRepository;
