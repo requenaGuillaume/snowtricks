@@ -2,16 +2,18 @@
 
 namespace App\Entity;
 
+use App\InterfaceClass\ImageEntityInterface;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\TrickRepository;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: TrickRepository::class)]
 #[UniqueEntity('title')]
-class Trick
+class Trick implements ImageEntityInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -19,9 +21,11 @@ class Trick
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message: ('Title cannot be empty'))]
     private ?string $title = null;
 
     #[ORM\Column(type: Types::TEXT)]
+    #[Assert\NotBlank(message: ('Description cannot be empty'))]
     private ?string $description = null;
 
     #[ORM\Column(length: 255)]
@@ -31,6 +35,7 @@ class Trick
     private Collection $comments;
 
     #[ORM\Column]
+    #[Assert\NotBlank(message: ('Images cannot be empty'))]
     private array $images = [];
 
     #[ORM\Column]
@@ -42,6 +47,7 @@ class Trick
 
     #[ORM\ManyToOne(inversedBy: 'tricks')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Assert\NotBlank(message: ('Group cannot be empty'))]
     private ?Group $category = null;
 
     #[ORM\Column]
@@ -172,6 +178,19 @@ class Trick
     {
         $images = $this->getImages();
         return reset($images);
+    }
+
+    public function getSecondariesImages(): array
+    {
+        $allImages = $this->getImages();
+        $mainImage = $this->getMainImage();
+        $otherImages = $allImages;
+
+        if (($key = array_search($mainImage, $otherImages)) !== false) {
+            unset($otherImages[$key]);
+        }
+
+        return $otherImages;
     }
 
     public function getVideos(): array

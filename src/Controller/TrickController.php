@@ -2,12 +2,12 @@
 
 namespace App\Controller;
 
-use DateTime;
 use App\Entity\Trick;
-use DateTimeImmutable;
-use App\Entity\Comment;
 use App\Form\TrickFormType;
 use App\Form\CommentFormType;
+use App\Service\ImagesService;
+use App\Factory\CommentFactory;
+use App\Factory\TrickFactory;
 use App\Repository\CommentRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Knp\Component\Pager\PaginatorInterface;
@@ -16,28 +16,27 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\String\Slugger\AsciiSlugger;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
-use Symfony\Component\DependencyInjection\Attribute\Autowire;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class TrickController extends AbstractController
 {
 
-    public function __construct(
-        private EntityManagerInterface $em,
-
-        #[Autowire('%kernel.project_dir%/public/assets/images/tricks')]
-        private $dir
-    )
+    public function __construct(private EntityManagerInterface $em, private ImagesService $imagesService)
     {}
 
-    #[Route('/trick/show/{slug}', name: 'app_trick', requirements: ['slug' => '[a-z0-9][a-z0-9-]{0,}[a-z0-9]'])]
-    public function show(
+    #[Route('/trick/show/{slug}',
+        name: 'app_trick', 
+        requirements: ['slug' => '[a-z0-9][a-z0-9-]{0,}[a-z0-9]'],
+        methods: ['GET', 'POST'])
+    ]
+    public function show(        
+        Request $request,
+        CommentRepository $commentRepository,
+        CommentFactory $commentFactory,
+        PaginatorInterface $paginator,
         ?Trick $trick, 
-        Request $request, 
-        CommentRepository $commentRepository, 
-        PaginatorInterface $paginator
     ): Response
     {
         if(!$trick){
@@ -45,29 +44,11 @@ class TrickController extends AbstractController
             return $this->redirectToRoute('app_home');
         }
 
-        $allImages = $trick->getImages();
-        $mainImage = $trick->getMainImage();
-        $otherImages = [];
-
-        for($i = 1; $i <= count($allImages); ++$i){
-            $otherImages = $allImages;
-            if (($key = array_search($mainImage, $otherImages)) !== false) {
-                unset($otherImages[$key]);
-            }
-        }
-
         $form = $this->createForm(CommentFormType::class);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $content = $form->get('content')->getData();
-
-            $comment = new Comment();
-            $comment->setAuthor($this->getUser())
-                ->setTrick($trick)
-                ->setCreatedAt(DateTimeImmutable::createFromMutable(new DateTime()))
-                ->setContent($content);
-
+            $comment = $commentFactory->createOne($trick, $form->get('content')->getData());
             $this->em->persist($comment);
             $this->em->flush();
 
@@ -82,38 +63,37 @@ class TrickController extends AbstractController
 
         return $this->render('trick/index.html.twig', [
             'trick' => $trick,
-            'mainImage' => $mainImage,
-            'otherImages' => $otherImages,
+            'mainImage' => $trick->getMainImage(),
+            'otherImages' => $trick->getSecondariesImages(),
             'commentForm' => $form->createView(),
             'pagination' => $pagination
         ]);
     }
 
     #[IsGranted('ROLE_USER')]
-    #[Route('/trick/create', name: 'app_trick_create')]
-    #[Route('/trick/edit/{slug}', name: 'app_trick_edit', requirements: ['slug' => '[a-z0-9][a-z0-9-]{0,}[a-z0-9]'])]
-    public function createOrEdit(?Trick $trick = null, Request $request): Response
+    #[Route('/trick/create', name: 'app_trick_create', methods: ['GET', 'POST'])]
+    #[Route('/trick/edit/{slug}', 
+        name: 'app_trick_edit', 
+        requirements: ['slug' => '[a-z0-9][a-z0-9-]{0,}[a-z0-9]'],
+        methods: ['GET', 'POST'])
+    ]
+    public function createOrEdit(Request $request, TrickFactory $trickFactory, ?Trick $trick = null): Response
     {
-        $edit = false;
-
-        if($request->attributes->get('_route') === 'app_trick_edit'){
-            if(!$trick){
-                $this->addFlash('danger', 'Trick not found');
-                return $this->redirectToRoute('app_home');
-            }
-
-            $edit = true;
-        }
+        $edit = $this->isEditMode($request);
 
         if(!$edit){
-            $trick = new Trick();
-        }       
+            $trick = $trickFactory->createOneEmpty();
+        }
+
+        if($edit && !$trick){
+            $this->addFlash('danger', 'Trick not found');
+            return $this->redirectToRoute('app_home');
+        }
 
         $form = $this->createForm(TrickFormType::class, $trick);
         $form->handleRequest($request);
 
         if($form->isSubmitted() && $form->isValid()){
-            // images
             $formImages = $form['images']->getData();
 
             if(!$edit && !$formImages){
@@ -121,39 +101,19 @@ class TrickController extends AbstractController
                 return $this->redirectToRoute('app_trick_create');
             }
 
-            $files = scandir($this->dir, SCANDIR_SORT_DESCENDING);
-            $latestImageNumber = $this->getLastImageNumber($files);
-
-            foreach($formImages as $image){
-                ++$latestImageNumber;
-                $extension = explode('.', $image->getClientOriginalName())[1];
-                $imageName = "$latestImageNumber.$extension";
-
-                /** @var UploadedFile $image */
-                $image->move($this->dir, $imageName);
-
-                if(!$edit){
-                    $trick->setImages([]);
-                }
-
-                $trick->addImage($imageName);
-            }
-
-            // video
+            $this->imagesService->addImages($trick, $formImages);
             $formVideo = $form['video']->getData();
 
             if($formVideo){
-                $trick->addVideo(str_replace('watch?v=', 'embed/',$formVideo ));
+                $trick->addVideo(str_replace('watch?v=', 'embed/', $formVideo));
             }
 
             if(!$edit){
-                $title = $form['title']->getData();
                 $slugger = new AsciiSlugger();
-                $slug = $slugger->slug(strtolower($title)); 
-                $trick->setSlug($slug)
-                    ->setCreatedAt(new DateTimeImmutable())
-                    ->setAuthor($this->getUser());
+                $slug = $slugger->slug(strtolower($form['title']->getData())); 
+                $trickFactory->fillMissingFields($trick, $slug);                
                 $this->em->persist($trick);
+
                 $this->addFlash('success', 'Trick has been successfully created');
             }else{
                 $this->addFlash('success', 'Trick has been successfully updated');
@@ -173,14 +133,17 @@ class TrickController extends AbstractController
     #[IsGranted('ROLE_USER')]
     #[Route('/trick/delete/{slug}',
         name: 'app_trick_delete',
-        requirements: ['slug' => '[a-z0-9][a-z0-9-]{0,}[a-z0-9]']
-    )]
-    public function delete(Trick $trick): Response
+        requirements: ['slug' => '[a-z0-9][a-z0-9-]{0,}[a-z0-9]'],
+        methods: ['GET'])
+    ]
+    public function delete(?Trick $trick): RedirectResponse
     {
-        foreach($trick->getImages() as $image){
-            unlink("{$this->dir}/$image");
+        if(!$trick){
+            $this->addFlash('danger', 'Trick not found');
+            return $this->redirectToRoute('app_home');
         }
 
+        $this->imagesService->removeAllImages($trick);
         $this->em->remove($trick);
         $this->em->flush();
 
@@ -191,29 +154,28 @@ class TrickController extends AbstractController
     #[IsGranted('ROLE_USER')]
     #[Route('/trick/edit/{slug}/remove-image/{image}', 
         name: 'app_trick_remove_image', 
-        requirements: ['slug' => '[a-z0-9][a-z0-9-]{0,}[a-z0-9]', 'image' => '\d+\.{1}(jpg|jpeg|png)']
+        requirements: ['slug' => '[a-z0-9][a-z0-9-]{0,}[a-z0-9]', 'image' => '\d+\.{1}(jpg|jpeg|png)'],
+        methods: ['GET']
     )]
-    public function removeImage(Trick $trick, string $image): JsonResponse
+    public function removeImage(?Trick $trick, string $image): JsonResponse|RedirectResponse
     {
         if(!$trick){
             $this->addFlash('danger', 'Trick not found');
-            return new JsonResponse(null, 404);
+            return $this->redirectToRoute('app_home');
         }
 
         if($trick->getMainImage() === $image){
             $this->addFlash('danger', 'You cannot delete the main image');
-            return new JsonResponse(null, 403);
+            return $this->redirectToRoute('app_home');
         }
 
         if(!in_array($image, $trick->getImages())){
             $this->addFlash('danger', 'This trick does not have this image');
-            return new JsonResponse(null, 404);
+            return $this->redirectToRoute('app_home');
         }
 
-        $trick->removeImage($image);
+        $this->imagesService->removeOneImage($trick, $image);
         $this->em->flush();
-
-        unlink("{$this->dir}/$image");
 
         return new JsonResponse();
     }
@@ -221,17 +183,22 @@ class TrickController extends AbstractController
     #[IsGranted('ROLE_USER')]
     #[Route('/trick/edit/{slug}/main-image/{image}', 
         name: 'app_trick_main_image', 
-        requirements: ['slug' => '[a-z0-9][a-z0-9-]{0,}[a-z0-9]', 'image' => '\d+\.{1}(jpg|jpeg|png)']
+        requirements: ['slug' => '[a-z0-9][a-z0-9-]{0,}[a-z0-9]', 'image' => '\d+\.{1}(jpg|jpeg|png)'],
+        methods: ['GET']
     )]
-    public function setMainImage(Trick $trick, string $image): JsonResponse
-    {        
+    public function setMainImage(?Trick $trick, string $image): JsonResponse|RedirectResponse
+    {
         if(!$trick){
             $this->addFlash('danger', 'Trick not found');
-            return new JsonResponse(null, 404);
+            return $this->redirectToRoute('app_home');
+        }
+
+        if(!in_array($image, $trick->getImages())){
+            $this->addFlash('danger', 'This trick does not have this image');
+            return $this->redirectToRoute('app_home');
         }
 
         $trick->setMainImage($image);
-
         $this->em->flush();
 
         return new JsonResponse();
@@ -240,41 +207,39 @@ class TrickController extends AbstractController
     #[IsGranted('ROLE_USER')]
     #[Route('/trick/edit/{slug}/remove-video/{videoIndex}', 
         name: 'app_trick_remove_video',
-        requirements: ['slug' => '[a-z0-9][a-z0-9-]{0,}[a-z0-9]', 'videoIndex' => '\d+']
+        requirements: ['slug' => '[a-z0-9][a-z0-9-]{0,}[a-z0-9]', 'videoIndex' => '\d+'],
+        methods: ['GET']
     )]
-    public function removeVideo(Trick $trick, int $videoIndex): JsonResponse
+    public function removeVideo(Trick $trick, int $videoIndex): JsonResponse|RedirectResponse
     {
         if(!$trick){
             $this->addFlash('danger', 'Trick not found');
-            return new JsonResponse(null, 404);
+            return $this->redirectToRoute('app_home');
         }
+        
+        $videos = $trick->getVideos();
 
-        $video = $trick->getVideos()[$videoIndex];
-
-        if(!$video){
+        if(!$videos || !$videos[$videoIndex]){
             $this->addFlash('danger', 'Video not found');
-            return new JsonResponse(null, 404);
+            return $this->redirectToRoute('app_home');
         }
 
-        $trick->removeVideo($video);
+        $trick->removeVideo($videos[$videoIndex]);
         $this->em->flush();
 
         return new JsonResponse();
     }
 
-    private function getLastImageNumber(array|bool $files): int
+
+    private function isEditMode(Request $request): bool
     {
-        $latestImageNumber = 0;
+        $edit = false;
 
-        foreach($files as $file){
-            $imageNumber = explode('.', $file)[0];
-
-            if($imageNumber > $latestImageNumber){
-                $latestImageNumber = $imageNumber;
-            }
+        if($request->attributes->get('_route') === 'app_trick_edit'){
+            $edit = true;
         }
 
-        return $latestImageNumber;
+        return $edit;
     }
 
 }
