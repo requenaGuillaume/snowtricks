@@ -33,7 +33,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private ?string $password = null;
 
-    // TODO Il prend pas l'assert email..
     #[ORM\Column(length: 255)]
     #[Assert\Email(message: 'You must enter a valid email')]
     private ?string $email = null;
