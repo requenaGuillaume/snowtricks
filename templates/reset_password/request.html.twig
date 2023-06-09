@@ -1,18 +1,7 @@
 {% extends 'base.html.twig' %}
 
 {% block stylesheets %}
-    <style>
-        @media screen and (max-width: 768px){
-           form{
-                width: 70% !important;
-                margin: 0 auto;
-            }
-
-            form button{
-                width: 80%;
-            }
-        }
-    </style>
+    <link rel="stylesheet" href={{ asset('assets/css/passwordrequest.css') }}>
 {% endblock %}
 
 {% block title %}Forgot password{% endblock %}

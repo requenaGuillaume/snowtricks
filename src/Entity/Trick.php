@@ -35,7 +35,6 @@ class Trick implements ImageEntityInterface
     private Collection $comments;
 
     #[ORM\Column]
-    #[Assert\NotBlank(message: ('Images cannot be empty'))]
     private array $images = [];
 
     #[ORM\Column]

@@ -1,98 +1,7 @@
 {% extends 'base.html.twig' %}
 
 {% block stylesheets %}
-    <style>
-        .height-10{
-            height: 10%;
-        }
-        h1{            
-            text-shadow: 1px 1px 3px black;
-        }
-        .title{
-            height: 80%;
-        }
-        .edit{
-            color: green;
-        }
-        .trash{
-            color: red;
-        }
-        #medias div:not(:last-child){
-            margin-right: 1rem;
-        }
-        .pagination{
-            justify-content: center;
-        }
-        .current{
-            padding: 0.4rem;
-            border: 1px solid black;
-            background-color : #8e9e93;
-            color: rgb(33,37,41);
-        }
-        .first,
-        .previous,
-        .page,
-        .next,
-        .last{
-            padding: 0.2rem;
-            border: 1px solid black;
-            background-color : #6c7a70;
-        }
-        .first,
-        .previous,
-        .page,
-        .next,
-        .last,
-        .current{
-            margin-left: 0.1rem;
-        }
-        .first a,
-        .previous a,
-        .page a,
-        .next a,
-        .last a{
-            padding: 0.2rem;
-            color: white;
-            text-decoration: none;
-        }
-        .bg-image{
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            width: 100%;
-            height: 70vh;
-        }
-        form{
-            margin: 0 auto;
-        }
-        textarea{
-            width: 60%;
-            height: 33px;
-        }
-        .avatars{
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-        }
-        button{
-            margin: 0 auto;
-        }
-        #see-media{
-            display: none;
-        }
-
-        @media screen and (max-width: 768px){
-            #see-media{
-                display: initial;
-            }
-            .hide{
-                display: none !important;
-            }
-            form{
-                width: 140%;
-            }
-        }
-    </style>
+    <link rel="stylesheet" href={{ asset('assets/css/showtrick.css') }}>
 {% endblock %}
 
 {% block title %}{{ trick.title | capitalize }}{% endblock %}
@@ -201,13 +110,5 @@
 {% endblock %}
 
 {% block javascripts %}
-    <script>
-        const mediaButton = document.getElementById('see-media');
-
-        mediaButton.addEventListener('click', () => {
-            medias.classList.remove('hide');
-            mediaButton.style.display = 'none';
-        });
-
-    </script>
+    <script src={{ asset('assets/js/showTrick.js') }}></script>
 {% endblock %}
