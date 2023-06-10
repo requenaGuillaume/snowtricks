@@ -4,7 +4,8 @@
 
 Database & database interface (like phpmyadmin, workbench, adminer ...)  
 php 8^  
-symfony 6.2^
+symfony 6.2^  
+Mail catcher (i used Mailtrap.io for example)
 
 ## Download the projet
 
