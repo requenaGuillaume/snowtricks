@@ -8,10 +8,8 @@ use Symfony\Bundle\SecurityBundle\Security;
 
 class CommentFactory
 {
-
     public function __construct(private Security $security)
     {
-        
     }
 
     public function createOne(Trick $trick, string $content): Comment
@@ -24,5 +22,4 @@ class CommentFactory
 
         return $comment;
     }
-
 }

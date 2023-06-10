@@ -14,7 +14,6 @@ use Symfony\Component\String\Slugger\SluggerInterface;
 
 class AppFixtures extends Fixture
 {
-    
     private const GROUPS_INFOS = [
         [
             'title' => 'grab',
@@ -105,7 +104,7 @@ class AppFixtures extends Fixture
 
 
     public function __construct(private SluggerInterface $slugger)
-    {        
+    {
     }
 
     public function load(ObjectManager $manager): void
@@ -113,11 +112,11 @@ class AppFixtures extends Fixture
         // Groups
         $groups = [];
 
-        foreach(self::GROUPS_INFOS as $groupInfos){
+        foreach (self::GROUPS_INFOS as $groupInfos) {
             $group = new Group();
             $group->setTitle(trim($groupInfos['title']))
                 ->setDescription(trim($groupInfos['description']));
-            
+
             $manager->persist($group);
 
             $groups[] = $group;
@@ -127,7 +126,7 @@ class AppFixtures extends Fixture
 
         // Users
         $users = [];
-        for($i = 0; $i < 10; $i++){
+        for ($i = 0; $i < 10; $i++) {
             $user = new User();
             $user->setUsername($faker->name())
                 ->setEmail($faker->email())
@@ -140,16 +139,16 @@ class AppFixtures extends Fixture
         }
 
         // Tricks
-        for($t = 0; $t < 10; $t++){
+        for ($t = 0; $t < 10; $t++) {
             $trick = new Trick();
 
             $groupIndex = 0;
 
-            if($t > 2 && $t <= 5){
+            if ($t > 2 && $t <= 5) {
                 $groupIndex = 1;
             }
 
-            if($t > 5){
+            if ($t > 5) {
                 $groupIndex = 2;
             }
 
@@ -167,7 +166,7 @@ class AppFixtures extends Fixture
             // Comments
             $numberOfComments = mt_rand(2, 5);
 
-            for($c = 0; $c < $numberOfComments; $c++){
+            for ($c = 0; $c < $numberOfComments; $c++) {
                 $comment = new Comment();
                 $comment->setAuthor($users[mt_rand(0, 9)])
                     ->setContent($faker->paragraph())
@@ -175,7 +174,7 @@ class AppFixtures extends Fixture
                     ->setTrick($trick);
 
                 $trick->addComment($comment);
-                
+
                 $manager->persist($comment);
             }
 

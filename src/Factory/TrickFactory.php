@@ -8,10 +8,8 @@ use Symfony\Bundle\SecurityBundle\Security;
 
 class TrickFactory
 {
-
     public function __construct(private Security $security)
     {
-        
     }
 
     public function createOneEmpty(): Trick
@@ -30,5 +28,4 @@ class TrickFactory
 
         return $trick;
     }
-
 }

@@ -161,8 +161,8 @@ class Trick implements ImageEntityInterface
     }
 
     public function setMainImage(string $image): self
-    {        
-        if(in_array($image, $this->getImages())){
+    {
+        if (in_array($image, $this->getImages())) {
             $this->removeImage($image);
         }
 
@@ -268,5 +268,4 @@ class Trick implements ImageEntityInterface
 
         return $this;
     }
-    
 }

@@ -38,5 +38,4 @@ class GroupRepository extends ServiceEntityRepository
             $this->getEntityManager()->flush();
         }
     }
-
 }
