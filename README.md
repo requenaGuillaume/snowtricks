@@ -23,7 +23,7 @@ Run the terminal command : "composer install"
 ## Create database
 
 Create database using terminal command : "symfony console d:d:c"  
-Run the migrations using terminal command : "symfony console d:\m:m"
+Run the migrations using terminal command : "symfony console doctrine:migrations:migrate"
 
 ## Fixtures
 
