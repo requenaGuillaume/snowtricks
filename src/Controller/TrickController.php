@@ -96,7 +96,7 @@ class TrickController extends AbstractController
         $form = $this->createForm(TrickFormType::class, $trick);
         $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid()) {
+        if ($form->isSubmitted() && $form->isValid()) {            
             $formImages = $form['images']->getData();
 
             if (!$edit && !$formImages) {

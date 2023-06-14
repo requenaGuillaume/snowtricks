@@ -21,6 +21,10 @@ class CommentFormType extends AbstractType
                     new NotBlank([
                         'message' => 'You must submit a content'
                     ]),
+                    new Length([
+                        'min' => 3,
+                        'minMessage' => 'Content must contain at least 3 characters'
+                    ]),
                 ],
             ])
         ;

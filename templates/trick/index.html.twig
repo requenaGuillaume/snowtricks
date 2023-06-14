@@ -77,6 +77,7 @@
             <div class="w-75" style="margin: 0 auto;">            
                 {{ form_start(commentForm) }}
                     {{ form_widget(commentForm.content, {'attr': {'class': 'd-inline'}}) }}
+                    {{ form_errors(commentForm.content) }}
 
                     <button type="submit" class="d-inline btn btn-primary mb-4 ms-2">
                         Leave a comment
