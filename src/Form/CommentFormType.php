@@ -34,6 +34,7 @@ class CommentFormType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => Comment::class,
+            'validation_groups' => ['Default'],
         ]);
     }
 }

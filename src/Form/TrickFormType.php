@@ -6,13 +6,15 @@ use App\Entity\Group;
 use App\Entity\Trick;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Validator\Constraints\Url;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Validator\Constraints\Length;
+use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\UrlType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
-use Symfony\Component\Validator\Constraints\Url;
 
 class TrickFormType extends AbstractType
 {
@@ -21,13 +23,26 @@ class TrickFormType extends AbstractType
         $builder
             ->add('title', TextType::class, [
                 'constraints' => [
+                    new NotBlank([
+                        'message' => 'Title cannot be blank'
+                    ]),
                     new Length([
                         'min' => 3,
                         'minMessage' => 'Title must contain at least 3 characters'
                     ]),
                 ],
             ])
-            ->add('description')
+            ->add('description', TextareaType::class, [
+                'constraints' => [
+                    new NotBlank([
+                        'message' => 'Description cannot be blank'
+                    ]),
+                    new Length([
+                        'min' => 3,
+                        'minMessage' => 'Descritpion must contain at least 3 characters'
+                    ]),
+                ],
+            ])
             ->add('category', EntityType::class, [
                 'class' => Group::class,
                 'choice_label' => 'title'

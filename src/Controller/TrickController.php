@@ -82,6 +82,7 @@ class TrickController extends AbstractController
     ]
     public function createOrEdit(Request $request, TrickFactory $trickFactory, ?Trick $trick = null): Response
     {
+
         $edit = $this->isEditMode($request);
 
         if (!$edit) {
@@ -95,6 +96,7 @@ class TrickController extends AbstractController
 
         $form = $this->createForm(TrickFormType::class, $trick);
         $form->handleRequest($request);
+        // Ce gogol essaye de remplir l'entité avant de tester les contraintes ?
 
         if ($form->isSubmitted() && $form->isValid()) {            
             $formImages = $form['images']->getData();
