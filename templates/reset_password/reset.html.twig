@@ -3,23 +3,7 @@
 {% block title %}Reset your password{% endblock %}
 
 {% block stylesheets %}
-    <style>
-        label{
-            display: block;
-            text-align: center;
-        }
-
-        @media screen and (max-width: 768px){
-           form{
-                width: 70% !important;
-                margin: 0 auto;
-            }
-
-            form button{
-                width: 80%;
-            }
-        }
-    </style>
+    <link rel="stylesheet" href={{ asset('assets/css/passwordreset.css') }}>
 {% endblock %}
 
 {% block body %}

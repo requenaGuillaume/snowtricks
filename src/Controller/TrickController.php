@@ -22,24 +22,25 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class TrickController extends AbstractController
 {
-
     public function __construct(private EntityManagerInterface $em, private ImagesService $imagesService)
-    {}
+    {
+    }
 
-    #[Route('/trick/show/{slug}',
-        name: 'app_trick', 
+    #[Route(
+        '/trick/show/{slug}',
+        name: 'app_trick',
         requirements: ['slug' => '[a-z0-9][a-z0-9-]{0,}[a-z0-9]'],
-        methods: ['GET', 'POST'])
+        methods: ['GET', 'POST']
+    )
     ]
-    public function show(        
+    public function show(
         Request $request,
         CommentRepository $commentRepository,
         CommentFactory $commentFactory,
         PaginatorInterface $paginator,
-        ?Trick $trick, 
-    ): Response
-    {
-        if(!$trick){
+        ?Trick $trick,
+    ): Response {
+        if (!$trick) {
             $this->addFlash('danger', 'Trick page not found.');
             return $this->redirectToRoute('app_home');
         }
@@ -53,7 +54,7 @@ class TrickController extends AbstractController
             $this->em->flush();
 
             $this->addFlash('success', 'Your comment has been sent');
-        }       
+        }
 
         $pagination = $paginator->paginate(
             $commentRepository->findPaginationQuery($trick),
@@ -72,31 +73,34 @@ class TrickController extends AbstractController
 
     #[IsGranted('ROLE_USER')]
     #[Route('/trick/create', name: 'app_trick_create', methods: ['GET', 'POST'])]
-    #[Route('/trick/edit/{slug}', 
-        name: 'app_trick_edit', 
+    #[Route(
+        '/trick/edit/{slug}',
+        name: 'app_trick_edit',
         requirements: ['slug' => '[a-z0-9][a-z0-9-]{0,}[a-z0-9]'],
-        methods: ['GET', 'POST'])
+        methods: ['GET', 'POST']
+    )
     ]
     public function createOrEdit(Request $request, TrickFactory $trickFactory, ?Trick $trick = null): Response
     {
+
         $edit = $this->isEditMode($request);
 
-        if(!$edit){
+        if (!$edit) {
             $trick = $trickFactory->createOneEmpty();
         }
 
-        if($edit && !$trick){
+        if ($edit && !$trick) {
             $this->addFlash('danger', 'Trick not found');
             return $this->redirectToRoute('app_home');
         }
 
         $form = $this->createForm(TrickFormType::class, $trick);
-        $form->handleRequest($request);
+        $form->handleRequest($request);     
 
-        if($form->isSubmitted() && $form->isValid()){
+        if ($form->isSubmitted() && $form->isValid()) {            
             $formImages = $form['images']->getData();
 
-            if(!$edit && !$formImages){
+            if (!$edit && !$formImages) {
                 $this->addFlash('danger', 'You must choose at least one image for the trick');
                 return $this->redirectToRoute('app_trick_create');
             }
@@ -104,18 +108,18 @@ class TrickController extends AbstractController
             $this->imagesService->addImages($trick, $formImages);
             $formVideo = $form['video']->getData();
 
-            if($formVideo){
+            if ($formVideo) {
                 $trick->addVideo(str_replace('watch?v=', 'embed/', $formVideo));
             }
 
-            if(!$edit){
+            if (!$edit) {
                 $slugger = new AsciiSlugger();
-                $slug = $slugger->slug(strtolower($form['title']->getData())); 
-                $trickFactory->fillMissingFields($trick, $slug);                
+                $slug = $slugger->slug(strtolower($form['title']->getData()));
+                $trickFactory->fillMissingFields($trick, $slug);
                 $this->em->persist($trick);
 
                 $this->addFlash('success', 'Trick has been successfully created');
-            }else{
+            } else {
                 $this->addFlash('success', 'Trick has been successfully updated');
             }
 
@@ -131,14 +135,16 @@ class TrickController extends AbstractController
     }
 
     #[IsGranted('ROLE_USER')]
-    #[Route('/trick/delete/{slug}',
+    #[Route(
+        '/trick/delete/{slug}',
         name: 'app_trick_delete',
         requirements: ['slug' => '[a-z0-9][a-z0-9-]{0,}[a-z0-9]'],
-        methods: ['GET'])
+        methods: ['GET']
+    )
     ]
     public function delete(?Trick $trick): RedirectResponse
     {
-        if(!$trick){
+        if (!$trick) {
             $this->addFlash('danger', 'Trick not found');
             return $this->redirectToRoute('app_home');
         }
@@ -152,24 +158,25 @@ class TrickController extends AbstractController
     }
 
     #[IsGranted('ROLE_USER')]
-    #[Route('/trick/edit/{slug}/remove-image/{image}', 
-        name: 'app_trick_remove_image', 
+    #[Route(
+        '/trick/edit/{slug}/remove-image/{image}',
+        name: 'app_trick_remove_image',
         requirements: ['slug' => '[a-z0-9][a-z0-9-]{0,}[a-z0-9]', 'image' => '\d+\.{1}(jpg|jpeg|png)'],
         methods: ['GET']
     )]
     public function removeImage(?Trick $trick, string $image): JsonResponse|RedirectResponse
     {
-        if(!$trick){
+        if (!$trick) {
             $this->addFlash('danger', 'Trick not found');
             return $this->redirectToRoute('app_home');
         }
 
-        if($trick->getMainImage() === $image){
+        if ($trick->getMainImage() === $image) {
             $this->addFlash('danger', 'You cannot delete the main image');
             return $this->redirectToRoute('app_home');
         }
 
-        if(!in_array($image, $trick->getImages())){
+        if (!in_array($image, $trick->getImages())) {
             $this->addFlash('danger', 'This trick does not have this image');
             return $this->redirectToRoute('app_home');
         }
@@ -181,19 +188,20 @@ class TrickController extends AbstractController
     }
 
     #[IsGranted('ROLE_USER')]
-    #[Route('/trick/edit/{slug}/main-image/{image}', 
-        name: 'app_trick_main_image', 
+    #[Route(
+        '/trick/edit/{slug}/main-image/{image}',
+        name: 'app_trick_main_image',
         requirements: ['slug' => '[a-z0-9][a-z0-9-]{0,}[a-z0-9]', 'image' => '\d+\.{1}(jpg|jpeg|png)'],
         methods: ['GET']
     )]
     public function setMainImage(?Trick $trick, string $image): JsonResponse|RedirectResponse
     {
-        if(!$trick){
+        if (!$trick) {
             $this->addFlash('danger', 'Trick not found');
             return $this->redirectToRoute('app_home');
         }
 
-        if(!in_array($image, $trick->getImages())){
+        if (!in_array($image, $trick->getImages())) {
             $this->addFlash('danger', 'This trick does not have this image');
             return $this->redirectToRoute('app_home');
         }
@@ -205,21 +213,22 @@ class TrickController extends AbstractController
     }
 
     #[IsGranted('ROLE_USER')]
-    #[Route('/trick/edit/{slug}/remove-video/{videoIndex}', 
+    #[Route(
+        '/trick/edit/{slug}/remove-video/{videoIndex}',
         name: 'app_trick_remove_video',
         requirements: ['slug' => '[a-z0-9][a-z0-9-]{0,}[a-z0-9]', 'videoIndex' => '\d+'],
         methods: ['GET']
     )]
     public function removeVideo(Trick $trick, int $videoIndex): JsonResponse|RedirectResponse
     {
-        if(!$trick){
+        if (!$trick) {
             $this->addFlash('danger', 'Trick not found');
             return $this->redirectToRoute('app_home');
         }
-        
+
         $videos = $trick->getVideos();
 
-        if(!$videos || !$videos[$videoIndex]){
+        if (!$videos || !$videos[$videoIndex]) {
             $this->addFlash('danger', 'Video not found');
             return $this->redirectToRoute('app_home');
         }
@@ -235,11 +244,10 @@ class TrickController extends AbstractController
     {
         $edit = false;
 
-        if($request->attributes->get('_route') === 'app_trick_edit'){
+        if ($request->attributes->get('_route') === 'app_trick_edit') {
             $edit = true;
         }
 
         return $edit;
     }
-
 }

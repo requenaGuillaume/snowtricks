@@ -1,0 +1,29 @@
+#bottom-arrow i:hover {
+  color: blue !important;
+}
+
+.hidden {
+  display: none !important;
+}
+
+#arrowUp {
+  display: none;
+}
+
+@media screen and (max-width: 1200px) {
+  .card {
+    width: 30%;
+  }
+}
+
+@media screen and (max-width: 991px) {
+  body .container p + .d-flex .card {
+    width: 30% !important;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .card {
+    width: 90%;
+  }
+}

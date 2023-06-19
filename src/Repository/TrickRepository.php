@@ -38,5 +38,4 @@ class TrickRepository extends ServiceEntityRepository
             $this->getEntityManager()->flush();
         }
     }
-
 }

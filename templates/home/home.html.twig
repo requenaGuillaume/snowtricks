@@ -1,37 +1,7 @@
 {% extends 'base.html.twig' %}
 
 {% block stylesheets %}
-    <style>
-        #bottom-arrow i:hover{
-            color: blue !important;
-        }
-        
-        .hidden{
-            display: none !important;
-        }
-
-        #arrowUp{
-            display: none;
-        }
-
-        @media screen and (max-width: 1200px){
-            .card{
-                width: 30%;
-            }
-        }
-
-        @media screen and (max-width: 991px){
-           body .container p + .d-flex .card{
-                width: 30% !important;
-            }
-        }
-
-        @media screen and (max-width: 768px){
-            .card{
-                width: 90%;
-            }
-        }
-    </style>
+    <link rel="stylesheet" href={{ asset('assets/css/home.css') }}>
 {% endblock %}
 
 {% block title %}Home{% endblock %}
@@ -79,21 +49,5 @@
 {% endblock %}
 
 {% block javascripts %}
-    <script>
-        const hiddenCards = document.getElementsByClassName('hidden');
-        const cards = Array.from(hiddenCards);
-
-        if(cards.length > 0){
-            const loadMore = document.getElementById('loader');
-
-            loadMore.addEventListener('click', function(){                
-                for(card of cards){
-                    card.classList.remove('hidden');
-                }
-
-                loadMore.classList.add('hidden');
-                document.getElementById('arrowUp').style.display = "inherit";
-            });
-        }
-    </script>
+    <script src={{ asset('assets/js/home.js') }}></script>
 {% endblock %}

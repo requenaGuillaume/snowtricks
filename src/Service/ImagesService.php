@@ -8,10 +8,8 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class ImagesService implements ImageServiceInterface
 {
-
     public function __construct(private string $folder)
     {
-        
     }
 
     public function removeOneImage(ImageEntityInterface $entity, string $image): void
@@ -23,7 +21,7 @@ class ImagesService implements ImageServiceInterface
 
     public function removeAllImages(ImageEntityInterface $entity): void
     {
-        foreach($entity->getImages() as $image){
+        foreach ($entity->getImages() as $image) {
             unlink("{$this->folder}/$image");
         }
     }
@@ -33,7 +31,7 @@ class ImagesService implements ImageServiceInterface
         $files = scandir($this->folder, SCANDIR_SORT_DESCENDING);
         $latestImageNumber = $this->getLastImageNumber($files);
 
-        foreach($imagesToAdd as $image){
+        foreach ($imagesToAdd as $image) {
             ++$latestImageNumber;
             $extension = explode('.', $image->getClientOriginalName())[1];
             $imageName = "$latestImageNumber.$extension";
@@ -49,15 +47,14 @@ class ImagesService implements ImageServiceInterface
     {
         $latestImageNumber = 0;
 
-        foreach($files as $file){
+        foreach ($files as $file) {
             $imageNumber = explode('.', $file)[0];
 
-            if($imageNumber > $latestImageNumber){
+            if ($imageNumber > $latestImageNumber) {
                 $latestImageNumber = $imageNumber;
             }
         }
 
         return $latestImageNumber;
     }
-
 }

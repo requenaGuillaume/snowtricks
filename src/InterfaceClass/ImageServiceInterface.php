@@ -8,5 +8,5 @@ interface ImageServiceInterface
 
     public function removeAllImages(ImageEntityInterface $entity): void;
 
-    public function addImages(ImageEntityInterface $entity, array $imagesToAdd): void;    
+    public function addImages(ImageEntityInterface $entity, array $imagesToAdd): void;
 }

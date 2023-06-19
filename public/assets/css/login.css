@@ -1,0 +1,18 @@
+.hide {
+  display: none;
+}
+
+@media screen and (max-width: 768px) {
+  .hide {
+    display: inherit;
+  }
+
+  form {
+    width: 70% !important;
+    margin: 0 auto;
+  }
+
+  form button {
+    width: 80%;
+  }
+}

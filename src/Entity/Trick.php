@@ -21,11 +21,9 @@ class Trick implements ImageEntityInterface
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Assert\NotBlank(message: ('Title cannot be empty'))]
     private ?string $title = null;
 
     #[ORM\Column(type: Types::TEXT)]
-    #[Assert\NotBlank(message: ('Description cannot be empty'))]
     private ?string $description = null;
 
     #[ORM\Column(length: 255)]
@@ -35,7 +33,6 @@ class Trick implements ImageEntityInterface
     private Collection $comments;
 
     #[ORM\Column]
-    #[Assert\NotBlank(message: ('Images cannot be empty'))]
     private array $images = [];
 
     #[ORM\Column]
@@ -71,7 +68,7 @@ class Trick implements ImageEntityInterface
         return $this->title;
     }
 
-    public function setTitle(string $title): self
+    public function setTitle(?string $title): self
     {
         $this->title = $title;
 
@@ -83,7 +80,7 @@ class Trick implements ImageEntityInterface
         return $this->description;
     }
 
-    public function setDescription(string $description): self
+    public function setDescription(?string $description): self
     {
         $this->description = $description;
 
@@ -162,8 +159,8 @@ class Trick implements ImageEntityInterface
     }
 
     public function setMainImage(string $image): self
-    {        
-        if(in_array($image, $this->getImages())){
+    {
+        if (in_array($image, $this->getImages())) {
             $this->removeImage($image);
         }
 
@@ -269,5 +266,4 @@ class Trick implements ImageEntityInterface
 
         return $this;
     }
-    
 }

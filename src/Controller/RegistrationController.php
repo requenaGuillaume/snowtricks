@@ -28,12 +28,11 @@ class RegistrationController extends AbstractController
 
     #[Route('/register', name: 'app_register', methods: ['GET', 'POST'])]
     public function register(
-        Request $request, 
-        UserPasswordHasherInterface $userPasswordHasher, 
+        Request $request,
+        UserPasswordHasherInterface $userPasswordHasher,
         EntityManagerInterface $entityManager,
         UserRepository $userRepository
-    ): Response
-    {
+    ): Response {
         $user = new User();
         $form = $this->createForm(RegistrationFormType::class, $user);
         $form->handleRequest($request);
@@ -41,14 +40,21 @@ class RegistrationController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $usernameAlreadyExist = $userRepository->findOneBy(['username' => $form->get('username')->getData()]);
 
-            if($usernameAlreadyExist){
+            if ($usernameAlreadyExist) {
                 $this->addFlash('danger', 'This username already exist.');
                 return $this->redirectToRoute('app_register');
             }
 
-            $emailAlreadyExist = $userRepository->findOneBy(['email' => $form->get('email')->getData()]);
+            $email = $form->get('email')->getData();
 
-            if($emailAlreadyExist){
+            if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                $this->addFlash('danger', 'This email does not seems valid.');
+                return $this->redirectToRoute('app_register');
+            }
+
+            $emailAlreadyExist = $userRepository->findOneBy(['email' => $email]);
+
+            if ($emailAlreadyExist) {
                 $this->addFlash('danger', 'This email already exist.');
                 return $this->redirectToRoute('app_register');
             }
@@ -60,13 +66,14 @@ class RegistrationController extends AbstractController
                 )
             )
             ->setUsername($form->get('username')->getData())
-            ->setEmail($form->get('email')->getData());
+            ->setEmail($email);
 
             $entityManager->persist($user);
             $entityManager->flush();
 
-            // generate a signed url and email it to the user
-            $this->emailVerifier->sendEmailConfirmation('app_verify_email', $user,
+            $this->emailVerifier->sendEmailConfirmation(
+                'app_verify_email',
+                $user,
                 (new TemplatedEmail())
                     ->from(new Address('noreply@snowtricks.com', 'Snowtricks automatic mail'))
                     ->to($user->getEmail())
@@ -89,7 +96,6 @@ class RegistrationController extends AbstractController
     {
         $user = $userRepository->find(intval($request->query->get('id')));
 
-        // validate email confirmation link, sets User::isVerified=true and persists
         try {
             $this->emailVerifier->handleEmailConfirmation($request, $user);
         } catch (VerifyEmailExceptionInterface $exception) {
