@@ -10,20 +10,17 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 class PaginatorService
 {
-
     public function __construct(
         private EntityManagerInterface $em,
         private RequestStack $requestStack
-    )
-    {        
+    ) {
     }
-    
+
     public function paginate(
-        string $entityClassToPaginate, 
-        HasPaginablePropertyInterface $subjectEntity, 
+        string $entityClassToPaginate,
+        HasPaginablePropertyInterface $subjectEntity,
         int $maxResults
-    ): array
-    {
+    ): array {
         $repository = $this->em->getRepository($entityClassToPaginate);
         $total = $repository->findCountForPagination($subjectEntity);
 
@@ -33,7 +30,7 @@ class PaginatorService
 
         $numberOfPages =  intval(ceil($total / $maxResults));
 
-        if($currentPage > $numberOfPages){
+        if ($currentPage > $numberOfPages) {
             $currentPage = $numberOfPages;
         }
 
@@ -54,11 +51,10 @@ class PaginatorService
     {
         $pageNumber = intval($request->query->get('page'));
 
-        if($pageNumber <= 0){
+        if ($pageNumber <= 0) {
             $pageNumber = 1;
         }
 
         return $pageNumber;
     }
-
 }
