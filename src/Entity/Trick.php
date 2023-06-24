@@ -2,18 +2,19 @@
 
 namespace App\Entity;
 
-use App\InterfaceClass\ImageEntityInterface;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\TrickRepository;
 use Doctrine\Common\Collections\Collection;
+use App\InterfaceClass\ImageEntityInterface;
 use Doctrine\Common\Collections\ArrayCollection;
-use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use App\InterfaceClass\HasPaginablePropertyInterface;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 #[ORM\Entity(repositoryClass: TrickRepository::class)]
 #[UniqueEntity('title')]
-class Trick implements ImageEntityInterface
+class Trick implements ImageEntityInterface, HasPaginablePropertyInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]

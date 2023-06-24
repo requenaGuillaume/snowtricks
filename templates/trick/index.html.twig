@@ -74,7 +74,7 @@
     </div>
     {% if app.user %}
         <div class="w-75 border-bottom mb-4" style="margin: 0 auto;">
-            <div class="w-75" style="margin: 0 auto;">            
+            <div class="w-75" style="margin: 0 auto;">
                 {{ form_start(commentForm) }}
                     {{ form_widget(commentForm.content, {'attr': {'class': 'd-inline'}}) }}
                     {{ form_errors(commentForm.content) }}
@@ -88,7 +88,7 @@
     {% endif %}
 
     <div class="w-75 mb-4" style="margin: 0 auto;">
-        {% for comment in pagination %}
+        {% for comment in paginationData.currentEntities %}
             {% if comment.author.photo is null %}
                 {% set photo = 'snowtricks.png' %}
                 {% set alt = 'Snowtricks logo' %}
@@ -106,7 +106,31 @@
         {% endfor %}
     </div>
 
-    {{ knp_pagination_render(pagination) }}
+    <div class="d-flex pagination">
+        {% if paginationData.currentPage != 1 %}
+            <p class="previous">
+                <a href="{{ path('app_trick', {'slug': trick.slug}) }}?page={{paginationData.previousPage}}">prev</a>
+            </p>
+        {% endif %}
+        
+        {% for i in 1..paginationData.numberOfPages %}
+            {% if i is same as(paginationData.currentPage) %}
+                <p class="current">
+                    <a href="{{ path('app_trick', {'slug': trick.slug}) }}">{{ i }}</a>
+                </p>
+            {% else %}
+                <p class="page">
+                    <a href="{{ path('app_trick', {'slug': trick.slug}) }}?page={{ i }}">{{ i }}</a>                
+                </p>
+            {% endif %}            
+        {% endfor %}
+
+        {% if paginationData.currentPage != paginationData.numberOfPages %}
+            <p class="next">
+                <a href="{{ path('app_trick', {'slug': trick.slug}) }}?page={{paginationData.nextPage}}">next</a>
+            </p>
+        {% endif %}
+    </div>
     
 {% endblock %}
 

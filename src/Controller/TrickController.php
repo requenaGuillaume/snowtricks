@@ -3,14 +3,15 @@
 namespace App\Controller;
 
 use App\Entity\Trick;
+use App\Entity\Comment;
 use App\Form\TrickFormType;
+use App\Factory\TrickFactory;
 use App\Form\CommentFormType;
 use App\Service\ImagesService;
 use App\Factory\CommentFactory;
-use App\Factory\TrickFactory;
+use App\Service\PaginatorService;
 use App\Repository\CommentRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -36,8 +37,8 @@ class TrickController extends AbstractController
     public function show(
         Request $request,
         CommentRepository $commentRepository,
+        PaginatorService $paginatorService,
         CommentFactory $commentFactory,
-        PaginatorInterface $paginator,
         ?Trick $trick,
     ): Response {
         if (!$trick) {
@@ -56,18 +57,14 @@ class TrickController extends AbstractController
             $this->addFlash('success', 'Your comment has been sent');
         }
 
-        $pagination = $paginator->paginate(
-            $commentRepository->findPaginationQuery($trick),
-            $request->query->get('page', 1),
-            10
-        );
+        $paginationData = $paginatorService->paginate(Comment::class, $trick, 10);
 
         return $this->render('trick/index.html.twig', [
             'trick' => $trick,
             'mainImage' => $trick->getMainImage(),
             'otherImages' => $trick->getSecondariesImages(),
             'commentForm' => $form->createView(),
-            'pagination' => $pagination
+            'paginationData' => $paginationData
         ]);
     }
 
