@@ -6,6 +6,7 @@ use App\Entity\Trick;
 use App\Entity\Comment;
 use Doctrine\ORM\Query;
 use Doctrine\Persistence\ManagerRegistry;
+use App\InterfaceClass\PaginableRepositoryInterface;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 
 /**
@@ -16,7 +17,7 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
  * @method Comment[]    findAll()
  * @method Comment[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class CommentRepository extends ServiceEntityRepository
+class CommentRepository extends ServiceEntityRepository implements PaginableRepositoryInterface
 {
     public function __construct(ManagerRegistry $registry)
     {
@@ -41,13 +42,27 @@ class CommentRepository extends ServiceEntityRepository
         }
     }
 
-   public function findPaginationQuery(Trick $trick): Query
-   {
-       return $this->createQueryBuilder('c')
-           ->where('c.trick = :trick')
-           ->orderBy('c.createdAt', 'DESC')
-           ->setParameter('trick', $trick)
-           ->getQuery()
-       ;
-   }
+    public function findCountForPagination(object $trick): int
+    {
+        return $this->createQueryBuilder('c')
+            ->select('count(c.id)')
+            ->where('c.trick = :trick')
+            ->setParameter(':trick', $trick)
+            ->getQuery()
+            ->getSingleScalarResult();
+        ;
+    }
+
+    public function findPagination(object $trick, int $maxResults, int $offset): array
+    {
+        return $this->createQueryBuilder('c')
+            ->where('c.trick = :trick')
+            ->orderBy('c.createdAt', 'DESC')
+            ->setParameter('trick', $trick)
+            ->setMaxResults($maxResults)
+            ->setFirstResult($offset)
+            ->getQuery()
+            ->getResult()
+        ;
+    }
 }
