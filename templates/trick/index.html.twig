@@ -106,31 +106,33 @@
         {% endfor %}
     </div>
 
-    <div class="d-flex pagination">
-        {% if paginationData.currentPage != 1 %}
-            <p class="previous">
-                <a href="{{ path('app_trick', {'slug': trick.slug}) }}?page={{paginationData.previousPage}}">prev</a>
-            </p>
-        {% endif %}
-        
-        {% for i in 1..paginationData.numberOfPages %}
-            {% if i is same as(paginationData.currentPage) %}
-                <p class="current">
-                    <a href="{{ path('app_trick', {'slug': trick.slug}) }}">{{ i }}</a>
+    {% if paginationData.numberOfPages %}
+        <div class="d-flex pagination">
+            {% if paginationData.currentPage != 1 %}
+                <p class="previous">
+                    <a href="{{ path('app_trick', {'slug': trick.slug}) }}?page={{paginationData.previousPage}}">prev</a>
                 </p>
-            {% else %}
-                <p class="page">
-                    <a href="{{ path('app_trick', {'slug': trick.slug}) }}?page={{ i }}">{{ i }}</a>                
-                </p>
-            {% endif %}            
-        {% endfor %}
+            {% endif %}
+            
+            {% for i in 1..paginationData.numberOfPages %}
+                {% if i is same as(paginationData.currentPage) %}
+                    <p class="current">
+                        <a href="{{ path('app_trick', {'slug': trick.slug}) }}">{{ i }}</a>
+                    </p>
+                {% else %}
+                    <p class="page">
+                        <a href="{{ path('app_trick', {'slug': trick.slug}) }}?page={{ i }}">{{ i }}</a>                
+                    </p>
+                {% endif %}            
+            {% endfor %}
 
-        {% if paginationData.currentPage != paginationData.numberOfPages %}
-            <p class="next">
-                <a href="{{ path('app_trick', {'slug': trick.slug}) }}?page={{paginationData.nextPage}}">next</a>
-            </p>
-        {% endif %}
-    </div>
+            {% if paginationData.currentPage != paginationData.numberOfPages %}
+                <p class="next">
+                    <a href="{{ path('app_trick', {'slug': trick.slug}) }}?page={{paginationData.nextPage}}">next</a>
+                </p>
+            {% endif %}
+        </div>
+    {% endif %}
     
 {% endblock %}
 
