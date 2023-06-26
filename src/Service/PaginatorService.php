@@ -30,11 +30,11 @@ class PaginatorService
 
         $numberOfPages =  intval(ceil($total / $maxResults));
 
-        if ($currentPage > $numberOfPages) {
+        if ($numberOfPages > 1 && $currentPage > $numberOfPages) {
             $currentPage = $numberOfPages;
         }
 
-        $offset = $maxResults * ($currentPage - 1);
+        $offset = $currentPage > 1 ? $maxResults * ($currentPage - 1) : 0;
 
         $currentEntities = $repository->findPagination($subjectEntity, $maxResults, $offset);
 

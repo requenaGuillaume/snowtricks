@@ -10,7 +10,6 @@ use App\Form\CommentFormType;
 use App\Service\ImagesService;
 use App\Factory\CommentFactory;
 use App\Service\PaginatorService;
-use App\Repository\CommentRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -36,7 +35,6 @@ class TrickController extends AbstractController
     ]
     public function show(
         Request $request,
-        CommentRepository $commentRepository,
         PaginatorService $paginatorService,
         CommentFactory $commentFactory,
         ?Trick $trick,
